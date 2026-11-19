@@ -1,0 +1,2 @@
+model,mode,train_samples,epochs,lora_rank,final_training_loss,training_seconds
+facebook/opt-125m,standard,2000,3,16,0.20319361654917398,61.62175154685974
