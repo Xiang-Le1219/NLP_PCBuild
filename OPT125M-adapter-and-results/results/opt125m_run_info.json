@@ -1,9 +1,0 @@
-{
-  "model": "facebook/opt-125m",
-  "mode": "standard",
-  "train_count": 2000,
-  "heldout_count": 100,
-  "manual_ood_count": 37,
-  "seed": 42,
-  "note": "Single-model requirement extraction; no explanation model trained."
-}
