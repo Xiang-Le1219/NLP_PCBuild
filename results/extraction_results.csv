@@ -1,0 +1,3 @@
+model,setting,test set,json_valid_%,exact_match_%,use_case_%,budget_%,currency_%,cpu_brand_%,gpu_brand_%,ram_gb_%,storage_gb_%,extras_%,compact_%,mean_field_acc_%,sec/example
+Rule-based,regex,synthetic,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,100.0,
+Rule-based,regex,OOD,100.0,67.57,75.68,89.19,100.0,100.0,100.0,100.0,100.0,100.0,100.0,96.1,

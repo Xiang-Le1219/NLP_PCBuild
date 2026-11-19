@@ -1,0 +1,7 @@
+PASS: Gaming PC below RM4500 with Ryzen and 16GB RAM -> RM4423.24
+PASS: Nak PC untuk kerja pejabat, bajet RM3000 -> RM2003.76
+PASS: Need a coding PC, budget USD1000 with 1TB SSD -> RM2966.44
+PASS: Gaming lah, budget RM5000, include monitor and mouse -> RM4955.62
+PASS: missing budget rejected
+PASS: infeasible budget rejected
+All offline smoke tests passed. OPT and Streamlit hosting are not covered.
