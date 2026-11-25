@@ -298,61 +298,75 @@ _UC_RULES = [
 
 
 def extract_budget_amount(text, default_currency="MYR"):
-    """Extract an explicitly stated PC budget.
+    """Extract a user-stated PC budget without mistaking hardware specs for it.
 
-    Supports forms such as RM5000, RM 5k, around 5k, budget 5,000,
-    USD 1.5k and 5k ringgit. An unqualified budget defaults to MYR,
-    which matches this Malaysia-focused application. Returns (amount, currency)
-    or None when no clear budget is present.
-
-    The parser deliberately avoids treating unrelated numbers (for example,
-    RTX 5070 or 32GB RAM) as a budget unless a budget/context phrase is present.
+    Handles common English/Manglish forms: RM5500, RM 5.5k, around 5k,
+    budget of 5,000, 5k budget, 5k ringgit, USD 1.5k, under RM8,000,
+    and "PC build for 5k". Returns (integer_amount, currency) or None.
     """
-    text = str(text or "").lower()
+    text = str(text or "").lower().replace("’", "'")
     number = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
     unit = r"(?P<unit>k|thousand|ribu)?"
     amount = rf"(?P<number>{number})\s*{unit}(?![a-z])"
 
     patterns = [
-        # Explicit currency prefix: RM5000, MYR 5k, USD 1.5k, $1200.
-        (rf"(?P<currency>rm|myr|usd|\$)\s*{amount}", "prefix"),
-        # Explicit currency suffix: 5k ringgit, 1200 USD.
-        (rf"(?P<number>{number})\s*(?P<unit>k|thousand|ribu)?\s*(?P<currency>ringgit|myr|usd|dollars?)\b", "suffix"),
-        # Contextual amount: around 5k, budget 5000, under RM5k, spend 6 thousand.
-        (rf"\b(?:budget|bajet|around|about|roughly|approximately|under|below|maximum|max|up to|not more than|spend|spending|within|for)\b"
-         rf"(?:\s+(?:is|of|about|around))?\s*(?P<currency>rm|myr|usd|\$)?\s*{amount}", "context"),
-        # Reverse wording: 5k budget / 5000 maximum.
-        (rf"{amount}\s+(?:budget|bajet|maximum|max)\b", "reverse"),
+        # Currency prefix: RM5500, RM 5.5k, MYR 5000, USD 1.5k, $1200.
+        rf"\b(?P<currency>rm|myr|usd)\s*(?P<number>{number})\s*(?P<unit>k|thousand|ribu)?(?![a-z])",
+        rf"\$\s*(?P<number>{number})\s*(?P<unit>k|thousand|ribu)?(?![a-z])",
+        # Currency suffix: 5k ringgit, 5500 MYR, 1.5k USD.
+        rf"(?P<number>{number})\s*(?P<unit>k|thousand|ribu)?\s*(?P<currency>ringgit|myr|usd|dollars?)\b",
+        # Context phrase followed by an amount.
+        rf"\b(?:budget|bajet|around|about|abt|roughly|approximately|approx|under|below|maximum|max|up to|not more than|not exceeding|spend|spending|within|price limit|spending limit)\b"
+        rf"(?:\s+(?:is|of|about|around|at|only|up to))?\s*(?P<currency>rm|myr|usd)?\s*{amount}",
+        # Amount followed by budget/limit wording: 5k budget / 5500 maximum.
+        rf"{amount}\s*(?:myr|rm)?\s*(?:budget|bajet|maximum|max|limit)\b",
+        # PC build wording: "build a PC for 5k" / "PC for around 5k".
+        rf"\b(?:pc|computer|build|setup)\b.{{0,35}}?\bfor\s+(?P<currency>rm|myr|usd)?\s*(?P<number>{number})\s*(?P<unit>k|thousand|ribu)?(?![a-z])",
     ]
 
-    for pattern, kind in patterns:
+    for pattern in patterns:
         match = re.search(pattern, text, flags=re.I)
         if not match:
             continue
+        groups = match.groupdict()
         try:
-            value = float(match.group("number").replace(",", ""))
+            value = float(groups["number"].replace(",", ""))
         except (TypeError, ValueError):
             continue
-        suffix = (match.groupdict().get("unit") or "").lower()
+        suffix = (groups.get("unit") or "").lower()
         if suffix in {"k", "thousand", "ribu"}:
             value *= 1000
         amount_value = int(round(value))
         if amount_value <= 0:
             return None
 
-        currency = (match.groupdict().get("currency") or default_currency).upper()
-        if currency == "$":
-            currency = "USD"
-        elif currency == "RM":
+        currency = (groups.get("currency") or default_currency).upper()
+        if currency == "RM" or currency == "RINGGIT":
             currency = "MYR"
-        elif currency in {"RINGGIT"}:
-            currency = "MYR"
-        elif currency == "DOLLARS" or currency == "DOLLAR":
+        elif currency in {"DOLLAR", "DOLLARS", "$"}:
             currency = "USD"
         if currency not in {"MYR", "USD"}:
             currency = default_currency
         return amount_value, currency
     return None
+
+
+def has_budget_mention(text):
+    """True only when the message contains a budget-like cue plus an amount.
+
+    Used as a cautious fallback for a fine-tuned extractor if a user's amount
+    wording is unusual and the deterministic parser cannot normalize it.
+    """
+    text = str(text or "").lower()
+    amount = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?\s*(?:k|thousand|ribu)?"
+    patterns = [
+        rf"\b(?:budget|bajet|around|about|abt|roughly|approximately|approx|under|below|maximum|max|up to|not more than|not exceeding|spend|spending|within|price limit|spending limit)\b.{{0,35}}?{amount}",
+        rf"\b(?:rm|myr|usd)\s*{amount}",
+        rf"\$\s*{amount}",
+        rf"{amount}\s*(?:ringgit|myr|usd|dollars?)\b",
+        rf"{amount}\s*(?:budget|bajet|maximum|max|limit)\b",
+    ]
+    return any(re.search(pattern, text, flags=re.I) for pattern in patterns)
 
 
 def rule_extract(text):
