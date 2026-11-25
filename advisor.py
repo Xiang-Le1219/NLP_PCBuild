@@ -52,27 +52,30 @@ class ModelSession:
             return rule_requirements(text), 'Rule-based fallback: OPT did not return usable JSON.', raw[0]
         req = N.normalise(preds[0])
         rules = rule_requirements(text)
-        # Budget must come from an explicit user statement. OPT can otherwise
-        # hallucinate a plausible-looking number (e.g. RM5,100) when none was given.
+        # Budget is a high-impact numeric constraint: never trust a generative
+        # model to invent or alter it. Use the explicitly parsed user amount.
         if rules['budget'] is not None:
             changed = (req['budget'], req['currency']) != (rules['budget'], rules['currency'])
             req['budget'], req['currency'] = rules['budget'], rules['currency']
-            source_suffix = ' + rule-based budget correction' if changed else ''
         else:
+            # If the user did not state a budget, discard any number hallucinated
+            # by OPT. The review form will ask the user to enter one explicitly.
             changed = req['budget'] is not None
             req['budget'] = None
             req['currency'] = rules['currency']
-            source_suffix = ' + unmentioned budget cleared' if changed else ''
-        source = self.mode + source_suffix
+        source = self.mode + (' + deterministic budget validation' if changed else '')
         return req, source, raw[0]
 
 
 def rule_requirements(text):
-    # The original regex recognizes RM and $, but not an explicit USD/MYR prefix.
-    # Normalize the prefix for the deployed baseline without altering experiment code.
+    """Deterministic extraction for deployment, including informal budget forms."""
     text = re.sub(r"\bUSD\s*(?=\d)", "$", text, flags=re.I)
     text = re.sub(r"\bMYR\s*(?=\d)", "RM", text, flags=re.I)
-    return N.normalise(N.rule_extract(text))
+    req = N.normalise(N.rule_extract(text))
+    budget_info = N.extract_budget_amount(text)
+    if budget_info is not None:
+        req['budget'], req['currency'] = budget_info
+    return req
 
 
 def baseline_extract(text):
@@ -80,15 +83,7 @@ def baseline_extract(text):
 
 
 def recommend(engine, req):
-    # budget_strategy is a UI/build-engine preference, not an NLP entity.
-    # Preserve it separately because N.normalise intentionally keeps only
-    # fields extracted from the user's natural-language request.
-    budget_strategy = (req.get('budget_strategy', 'closest_to_budget')
-                       if isinstance(req, dict) else 'closest_to_budget')
     req = N.normalise(req)
-    req['budget_strategy'] = (budget_strategy if budget_strategy in
-                              ('closest_to_budget', 'best_value')
-                              else 'closest_to_budget')
     if not req['budget']:
         return {'ok': False, 'message': 'Please specify a positive budget.'}, []
     result = engine.recommend(req)

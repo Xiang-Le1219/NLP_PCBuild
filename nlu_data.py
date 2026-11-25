@@ -265,7 +265,11 @@ def parse_model_output(text):
 
 EXTRACT_HEAD = ("Extract the PC requirements from the customer message as JSON.\n"
                 "Keys: use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, "
-                "storage_gb, extras, compact.\n")
+                "storage_gb, extras, compact.\n"
+                "IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. "
+                "Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. "
+                "If no budget is explicitly stated, return budget: null. "
+                "Never invent a budget or copy a numeric value from the examples.\n")
 
 
 def extract_prompt(text):
@@ -293,6 +297,64 @@ _UC_RULES = [
 ]
 
 
+def extract_budget_amount(text, default_currency="MYR"):
+    """Extract an explicitly stated PC budget.
+
+    Supports forms such as RM5000, RM 5k, around 5k, budget 5,000,
+    USD 1.5k and 5k ringgit. An unqualified budget defaults to MYR,
+    which matches this Malaysia-focused application. Returns (amount, currency)
+    or None when no clear budget is present.
+
+    The parser deliberately avoids treating unrelated numbers (for example,
+    RTX 5070 or 32GB RAM) as a budget unless a budget/context phrase is present.
+    """
+    text = str(text or "").lower()
+    number = r"(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?"
+    unit = r"(?P<unit>k|thousand|ribu)?"
+    amount = rf"(?P<number>{number})\s*{unit}(?![a-z])"
+
+    patterns = [
+        # Explicit currency prefix: RM5000, MYR 5k, USD 1.5k, $1200.
+        (rf"(?P<currency>rm|myr|usd|\$)\s*{amount}", "prefix"),
+        # Explicit currency suffix: 5k ringgit, 1200 USD.
+        (rf"(?P<number>{number})\s*(?P<unit>k|thousand|ribu)?\s*(?P<currency>ringgit|myr|usd|dollars?)\b", "suffix"),
+        # Contextual amount: around 5k, budget 5000, under RM5k, spend 6 thousand.
+        (rf"\b(?:budget|bajet|around|about|roughly|approximately|under|below|maximum|max|up to|not more than|spend|spending|within|for)\b"
+         rf"(?:\s+(?:is|of|about|around))?\s*(?P<currency>rm|myr|usd|\$)?\s*{amount}", "context"),
+        # Reverse wording: 5k budget / 5000 maximum.
+        (rf"{amount}\s+(?:budget|bajet|maximum|max)\b", "reverse"),
+    ]
+
+    for pattern, kind in patterns:
+        match = re.search(pattern, text, flags=re.I)
+        if not match:
+            continue
+        try:
+            value = float(match.group("number").replace(",", ""))
+        except (TypeError, ValueError):
+            continue
+        suffix = (match.groupdict().get("unit") or "").lower()
+        if suffix in {"k", "thousand", "ribu"}:
+            value *= 1000
+        amount_value = int(round(value))
+        if amount_value <= 0:
+            return None
+
+        currency = (match.groupdict().get("currency") or default_currency).upper()
+        if currency == "$":
+            currency = "USD"
+        elif currency == "RM":
+            currency = "MYR"
+        elif currency in {"RINGGIT"}:
+            currency = "MYR"
+        elif currency == "DOLLARS" or currency == "DOLLAR":
+            currency = "USD"
+        if currency not in {"MYR", "USD"}:
+            currency = default_currency
+        return amount_value, currency
+    return None
+
+
 def rule_extract(text):
     """Keyword / regex baseline (no learning)."""
     t = text.lower()
@@ -302,19 +364,9 @@ def rule_extract(text):
         if re.search(pat, t):
             out["use_case"] = uc
             break
-    m = re.search(r"(?:rm|\$)\s?([\d][\d,\.]*)\s?(k|ribu)?(?![a-z])|([\d][\d,\.]*)\s?(k|ribu)?(?![a-z])\s?(?:ringgit|usd|dollars|myr)", t)
-    if not m:
-        m = re.search(r"(?:budget|bajet)\s?(?:is |around |only )?([\d][\d,\.]*)\s?(k|ribu)?(?![a-z])", t)
-    if m:
-        groups = [g for g in m.groups() if g]
-        num = groups[0].replace(",", "")
-        try:
-            val = float(num.rstrip(".,")) * (1000 if len(groups) > 1 and groups[-1] in ("k", "ribu") else 1)
-            out["budget"] = int(val)
-        except ValueError:
-            pass
-    if "$" in t or re.search(r"\busd\b|dollars", t):
-        out["currency"] = "USD"
+    budget_info = extract_budget_amount(t)
+    if budget_info is not None:
+        out["budget"], out["currency"] = budget_info
     if re.search(r"all amd|semua amd|full amd|amd everything", t):
         out["cpu_brand"] = out["gpu_brand"] = "amd"
     elif re.search(r"intel and nvidia|intel cpu with nvidia|intel \+ rtx", t):
