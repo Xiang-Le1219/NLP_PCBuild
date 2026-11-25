@@ -24,7 +24,8 @@ from dataclasses import dataclass
 import numpy as np
 import pandas as pd
 
-USD_TO_MYR = 4.3          # change if the exchange rate changes
+USD_TO_MYR = 4.3          # fixed dataset assumption; update only with a verified rate
+DISPLAY_SAFETY_BUFFER_MYR = 0.01  # keep displayed 2-decimal total strictly below budget
 SUPPORTED_SOCKETS = {"AM4", "AM5", "LGA1200", "LGA1700", "LGA1851"}
 
 # --------------------------------------------------------------------------
@@ -381,6 +382,7 @@ class Requirement:
     storage_gb: int = None
     extras: tuple = ()
     compact: bool = False
+    budget_strategy: str = "closest_to_budget"
 
     @classmethod
     def from_dict(cls, d):
@@ -400,6 +402,9 @@ class Requirement:
             storage_gb=int(d["storage_gb"]) if d.get("storage_gb") else None,
             extras=tuple(e for e in ex if e in ("monitor", "keyboard", "mouse")),
             compact=bool(d.get("compact")),
+            budget_strategy=(d.get("budget_strategy")
+                             if d.get("budget_strategy") in ("closest_to_budget", "best_value")
+                             else "closest_to_budget"),
         )
 
     @property
@@ -561,7 +566,12 @@ class BuildEngine:
 
         # light-use profiles run on integrated graphics unless a GPU brand
         # was explicitly requested
-        wants_gpu = prof["dgpu"] or req.gpu_brand != "any"
+        # In closest-to-budget mode, allow a discrete GPU as an optional
+        # performance upgrade even for office/general/programming profiles.
+        # Users who prefer a lower-cost, workload-appropriate build can select
+        # best_value in the interface.
+        wants_gpu = (prof["dgpu"] or req.gpu_brand != "any"
+                     or req.budget_strategy == "closest_to_budget")
         if wants_gpu:
             gpu_options = [g for _, g in gpus.iterrows()]
         else:
@@ -570,11 +580,16 @@ class BuildEngine:
         cpu_key = "gaming_score" if prof["cpu"] == "gaming" else "multi_score"
 
         strict = cpus[cpus["cores"] >= MIN_CORES[req.use_case]]
+        # Leave a one-cent MYR guard so the UI's 2-decimal display is still
+        # strictly below the user's budget, rather than rounding to equality.
+        search_budget = max(0.0, core_budget - DISPLAY_SAFETY_BUFFER_MYR / USD_TO_MYR)
         best, cheapest = self._search(strict, gpu_options, req, prof, cpu_key,
-                                      ram_gb, ssd, core_budget)
+                                      ram_gb, ssd, search_budget,
+                                      req.budget_strategy)
         if best is None:                      # budget too small -> relax
             best, cheapest = self._search(cpus, gpu_options, req, prof, cpu_key,
-                                          ram_gb, ssd, core_budget)
+                                          ram_gb, ssd, search_budget,
+                                          req.budget_strategy)
 
         if best is None:
             mn = None if cheapest is None else (cheapest[-2] + extras_cost) * USD_TO_MYR
@@ -598,7 +613,7 @@ class BuildEngine:
         return self._pack(req, parts, watts, left, upgrades)
 
     def _search(self, cpus, gpu_options, req, prof, cpu_key, ram_gb, ssd,
-                core_budget):
+                core_budget, budget_strategy="best_value"):
         best, cheapest = None, None
         for _, cpu in cpus.iterrows():
             min_tier = 2 if (cpu["tdp"] >= 105 or cpu["cores"] >= 12) else 1
@@ -625,9 +640,18 @@ class BuildEngine:
                     continue
                 total = fixed + psu["price"] + (0 if gpu is None else gpu["price"])
                 obj = self._objective(req.use_case, prof, cpu, gpu, cpu_key)
-                obj *= (1 - 0.12 * total / max(core_budget, 1))   # mild thrift
-                cand = (obj, -total, cpu, gpu, board, ram, case, cooler, psu,
-                        total, watts)
+                if budget_strategy == "closest_to_budget":
+                    # Primary objective: spend as close as possible to the
+                    # available budget without ever exceeding it. Performance
+                    # is the tie-breaker when two builds have the same cost.
+                    cand = (total, obj, cpu, gpu, board, ram, case, cooler, psu,
+                            total, watts)
+                else:
+                    # Best-value mode prioritizes workload performance and
+                    # mildly penalizes unnecessary spending.
+                    obj *= (1 - 0.12 * total / max(core_budget, 1))
+                    cand = (obj, -total, cpu, gpu, board, ram, case, cooler, psu,
+                            total, watts)
                 if cheapest is None or total < cheapest[-2]:
                     cheapest = cand
                 if total <= core_budget and (best is None or cand[:2] > best[:2]):
@@ -711,10 +735,22 @@ class BuildEngine:
                               price_myr=float(r["price"]) * USD_TO_MYR,
                               spec=self._spec(k, r)))
         warnings = []
-        if left / max(req.budget_usd, 1) > 0.35 and req.use_case in ("office", "general", "programming"):
+        if (req.budget_strategy == "closest_to_budget"
+                and req.use_case in ("office", "general", "programming")
+                and "gpu" in parts):
+            warnings.append("Budget-focused mode included a discrete GPU to use more "
+                            "of the available budget. It may be unnecessary for light "
+                            "office workloads; choose Best value mode to avoid it.")
+        if (left / max(req.budget_usd, 1) > 0.15
+                and req.budget_strategy == "closest_to_budget"):
+            warnings.append("The catalogue could not use the full budget while meeting "
+                            "the implemented compatibility rules. The remaining budget "
+                            "is shown rather than exceeding your limit.")
+        elif (left / max(req.budget_usd, 1) > 0.35
+                and req.use_case in ("office", "general", "programming")):
             warnings.append("This use case does not need the whole budget, so the "
-                            "build stops early. Name a GPU brand or a higher use "
-                            "case (e.g. gaming) if you want to spend more.")
+                            "build stops early. Choose Closest under budget only if you "
+                            "want optional performance upgrades.")
         missing = sorted(set(req.extras) - set(parts))
         if missing:
             warnings.append("Requested peripherals not included within their allocated budget: " + ", ".join(missing))
@@ -728,7 +764,9 @@ class BuildEngine:
                     total_usd=total, total_myr=total * USD_TO_MYR,
                     budget_myr=req.budget_usd * USD_TO_MYR,
                     left_myr=left * USD_TO_MYR, psu_min_watts=watts,
-                    upgrades=upgrades, warnings=warnings)
+                    upgrades=upgrades, warnings=warnings,
+                    budget_strategy=req.budget_strategy,
+                    budget_utilization_pct=(100.0 * total / max(req.budget_usd, 1)))
 
     @staticmethod
     def _spec(k, r):
@@ -871,8 +909,10 @@ def validate_build(res, data):
         v.append("PSU too weak")
     if req.cpu_brand in ("amd", "intel") and cpu["brand"] != req.cpu_brand:
         v.append("CPU brand preference ignored")
-    if res["total_myr"] > res["budget_myr"] + 0.01:
+    if res["total_myr"] > res["budget_myr"] + 1e-6:
         v.append("over budget")
+    if res["total_myr"] >= res["budget_myr"] - 1e-6:
+        v.append("total is not strictly below budget")
     if req.ram_gb and int(ram["total_gb"]) < req.ram_gb:
         v.append("less RAM than requested")
     if "ssd" not in names:

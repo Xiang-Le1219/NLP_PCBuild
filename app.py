@@ -20,7 +20,18 @@ def load_model(mode):
 
 with st.sidebar:
     st.header('NLP settings')
-    mode = st.selectbox('Requirement extraction', A.available_modes())
+    mode = st.selectbox(
+        'Requirement extraction', A.available_modes(),
+        help="Choose how the user's natural-language PC requirements are interpreted."
+    )
+    with st.expander('What do these extraction modes mean?'):
+        st.markdown("""
+        - **Rule-based baseline:** uses keywords and regular expressions; fast and does not download a model.
+        - **Pretrained OPT-125M (few-shot):** uses the original OPT-125M checkpoint with example prompts; it has not been fine-tuned for this project.
+        - **Fine-tuned OPT-125M (LoRA):** uses the supplied project adapter trained for PC requirement extraction.
+
+        **Important:** this setting changes requirement extraction only. The separate PC engine selects components, enforces its budget rules, and builds the recommendation. The current build explanation is a deterministic template, not OPT-generated text.
+        """)
     if not A.adapter_ready():
         st.warning('No trained OPT adapter is included. The baseline is ready; pretrained OPT is available as an experimental option.')
     st.caption('OPT mode downloads the 125M base model on first use. CPU inference can be slow and may exceed free hosting resources.')
@@ -70,8 +81,19 @@ if 'parsed' in st.session_state:
         a,b,c = st.columns(3)
         use_cases = E.USE_CASES
         use = a.selectbox('Use case', use_cases, index=use_cases.index(req['use_case']), format_func=lambda v: v.replace('_', ' ').title())
-        budget = b.number_input('Maximum budget', min_value=0, value=min(req['budget'] or 0, 1000000), max_value=1000000, step=100)
+        budget = b.number_input('Maximum budget (required)', min_value=0, value=min(req['budget'] or 0, 1000000), max_value=1000000, step=100, help='If your message did not include a budget, enter it here. The model is not allowed to invent one.')
         currency = c.selectbox('Currency', ['MYR','USD'], index=['MYR','USD'].index(req['currency']))
+        strategy_label = st.selectbox(
+            'Build selection strategy',
+            ['Closest under budget (minimize leftover)',
+             'Best value (avoid unnecessary spending)'],
+            index=0,
+            help=('Closest under budget prioritizes the highest compatible total below '
+                  'your budget. It may include optional performance upgrades such as a '
+                  'discrete GPU. Best value prioritizes suitability for the selected use case.')
+        )
+        budget_strategy = ('closest_to_budget' if strategy_label.startswith('Closest')
+                           else 'best_value')
         a,b = st.columns(2)
         cpu = ['any','amd','intel']; gpu = ['any','nvidia','amd','intel']
         cpu_brand = a.selectbox('CPU preference', cpu, index=cpu.index(req['cpu_brand']))
@@ -83,7 +105,11 @@ if 'parsed' in st.session_state:
         compact = st.checkbox('Compact PC', value=req['compact'])
         build = st.form_submit_button('Generate compatible PC build', type='primary')
     if build:
-        confirmed = dict(use_case=use, budget=budget, currency=currency, cpu_brand=cpu_brand, gpu_brand=gpu_brand, ram_gb=ram or None, storage_gb=storage or None, extras=extras, compact=compact)
+        confirmed = dict(use_case=use, budget=budget, currency=currency,
+                         cpu_brand=cpu_brand, gpu_brand=gpu_brand,
+                         ram_gb=ram or None, storage_gb=storage or None,
+                         extras=extras, compact=compact,
+                         budget_strategy=budget_strategy)
         st.session_state.pop('build_result', None)
         try:
             with st.spinner('Searching the hardware catalogue…'):
@@ -103,6 +129,10 @@ if 'build_result' in st.session_state:
         a.metric('Estimated total', f"RM {res['total_myr']:,.2f}")
         b.metric('Budget', f"RM {res['budget_myr']:,.2f}")
         c.metric('Remaining', f"RM {res['budget_myr']-res['total_myr']:,.2f}")
+        st.caption(
+            f"Build strategy: {'Closest under budget' if res.get('budget_strategy') == 'closest_to_budget' else 'Best value'} "
+            f"• Budget used: {res.get('budget_utilization_pct', 0):.1f}%"
+        )
         df = pd.DataFrame([{'Component': E.CAT_LABEL[it['category']], 'Product': it['name'], 'Specifications': it['spec'], 'Price (RM)': round(it['price_myr'],2)} for it in res['items']])
         st.dataframe(df, hide_index=True, use_container_width=True)
         st.download_button('Download build CSV', df.to_csv(index=False).encode('utf-8'), 'recommended_pc.csv', 'text/csv')

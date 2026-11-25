@@ -10,6 +10,17 @@ BMDS2123 Natural Language Processing coursework prototype. Extracts natural-lang
 4. Start with the default rule-based mode. Choose pretrained OPT-125M in the sidebar to test few-shot inference (first use downloads weights; free CPU hosting may be too limited). A complete trained adapter automatically enables fine-tuned mode and becomes the default. If model loading or inference raises an exception, the app falls back to the baseline and labels it. Resource kills cannot necessarily be caught; use baseline mode or a larger host if that happens.
 5. Enter a request, analyse requirements, review/edit the extracted fields, and generate the build. The web app provides template explanations, not OPT-generated explanations.
 
+## Budget selection strategies
+
+The review form offers two build-selection strategies:
+
+- **Closest under budget (default):** searches compatible CPU/GPU combinations and selects the highest catalogue total that does not exceed the available component budget. For office/general/programming requests it may include a discrete GPU as an optional upgrade to use more of the budget; the app displays a warning about this.
+- **Best value:** retains workload-oriented selection and may leave substantial budget unused for light workloads, because an office PC does not necessarily benefit from expensive gaming hardware.
+
+The total is always constrained to be at or below the supplied budget under the engine's encoded prices and rules. Catalogue completeness and simplified compatibility assumptions still limit the result; a close-to-budget result is not a claim that the combination is objectively the best purchase.
+
+The sidebar's **Requirement extraction** selector has three possible modes: Rule-based baseline (regex/keywords), Pretrained OPT-125M (few-shot prompting), and Fine-tuned OPT-125M (LoRA requirement-extraction adapter). This selector affects requirement extraction only; the separate recommendation engine handles component selection. The currently displayed build explanation is a deterministic template, not OPT-generated text.
+
 ## Run locally
 
 Use Python 3.11 in a fresh virtual environment.
@@ -19,6 +30,7 @@ python -m venv .venv
 # Activate the virtual environment for your OS before installing.
 python -m pip install -r requirements.txt
 python smoke_test.py
+python test_budget_strategy.py
 streamlit run app.py
 ```
 

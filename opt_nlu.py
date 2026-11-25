@@ -269,12 +269,14 @@ class OptNLU:
         if p is None:
             return N.rule_extract(text), True, raw[0]
         p = N.normalise(p)
-        if p["budget"] is None:
-            fb = N.rule_extract(text)
-            p["budget"] = fb["budget"]
-            p["currency"] = fb["currency"]
-            return p, True, raw[0]
-        return p, False, raw[0]
+        fb = N.rule_extract(text)
+        # Never accept a numeric budget invented by the language model.
+        # Only a budget explicitly found in the user's text is authoritative.
+        had_explicit_budget = fb["budget"] is not None
+        changed = (p["budget"], p["currency"]) != (fb["budget"], fb["currency"])
+        p["budget"] = fb["budget"]
+        p["currency"] = fb["currency"]
+        return p, (not had_explicit_budget or changed), raw[0]
 
     def explain(self, res, pc_engine):
         if self.xm is None:
