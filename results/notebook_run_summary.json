@@ -1,0 +1,10 @@
+{
+  "usable_product_records": 5273,
+  "attributes_audited": 98,
+  "test_examples": 60,
+  "ood_examples": 37,
+  "pretrained_evaluated": false,
+  "fine_tuned_evaluated": false,
+  "pretrained_error": null,
+  "fine_tuned_error": null
+}

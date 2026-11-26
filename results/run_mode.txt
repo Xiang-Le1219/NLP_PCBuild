@@ -1,3 +1,6 @@
-Run mode: baseline
-Models: []
-USD_TO_MYR: 4.3 (fixed assumption, not live pricing)
+RUN_MODEL_EVALUATION=False
+RETRAIN_EXTRACT_ADAPTER=False
+Pretrained OPT evaluated=False
+Fine-tuned OPT evaluated=False
+Pretrained error=None
+Fine-tuned error=None

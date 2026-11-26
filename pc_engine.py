@@ -19,7 +19,7 @@ All prices in the CSVs are USD; they are converted to MYR for display.
 """
 import re
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 
 import numpy as np
 import pandas as pd
@@ -288,7 +288,21 @@ def clean_case(df):
 
 def clean_cooler(df):
     df = _priced_unique(df)
-    df = df[df["size"].isna() & df["noise_level"].notna() & (df["price"] >= 15)]
+    # Keep both air coolers (size missing) and liquid coolers (radiator size present).
+    # Radiator-to-case clearance is not validated by this catalogue engine.
+    df = df[df["noise_level"].notna() & (df["price"] >= 15)].copy()
+
+    def range_values(value):
+        nums = pd.to_numeric(pd.Series(str(value).split(",")), errors="coerce").dropna()
+        return (float(nums.min()), float(nums.max())) if len(nums) else (np.nan, np.nan)
+
+    rpm_ranges = df["rpm"].apply(range_values)
+    noise_ranges = df["noise_level"].apply(range_values)
+    df["rpm_min"] = [x[0] for x in rpm_ranges]
+    df["rpm_max"] = [x[1] for x in rpm_ranges]
+    df["noise_min"] = [x[0] for x in noise_ranges]
+    df["noise_max"] = [x[1] for x in noise_ranges]
+    df["size_mm"] = NUM(df["size"])
     return df.reset_index(drop=True)
 
 
@@ -383,6 +397,7 @@ class Requirement:
     extras: tuple = ()
     compact: bool = False
     budget_strategy: str = "closest_to_budget"
+    component_preferences: dict = field(default_factory=dict)
 
     @classmethod
     def from_dict(cls, d):
@@ -405,6 +420,7 @@ class Requirement:
             budget_strategy=(d.get("budget_strategy")
                              if d.get("budget_strategy") in ("closest_to_budget", "best_value")
                              else "closest_to_budget"),
+            component_preferences=d.get("component_preferences") or {},
         )
 
     @property
@@ -419,18 +435,62 @@ class BuildEngine:
         self._plat_cache = {}
         self._psu_cache = {}
 
+    # ---- dataset-backed preference filtering ----------------------------
+    def _apply_preferences(self, frame, component, req):
+        """Apply only user-stated catalogue preferences; omitted fields use defaults."""
+        if frame is None or frame.empty:
+            return frame
+        prefs = (getattr(req, "component_preferences", None) or {}).get(component, {})
+        out = frame
+        for col, rule in prefs.items():
+            if col not in out.columns or rule is None:
+                continue
+            if not isinstance(rule, dict):
+                rule = {"eq": rule}
+            series = out[col]
+            if "not_empty" in rule and rule["not_empty"]:
+                out = out[series.notna() & series.astype(str).str.strip().ne("")]
+                continue
+            if "contains" in rule:
+                value = str(rule["contains"])
+                out = out[out[col].astype(str).str.contains(re.escape(value), case=False, na=False)]
+                continue
+            if "in" in rule:
+                values = [str(v).lower() for v in rule["in"]]
+                out = out[out[col].astype(str).str.lower().isin(values)]
+            if "eq" in rule:
+                value = rule["eq"]
+                if isinstance(value, bool):
+                    norm = series.astype(str).str.lower().map({"true": True, "false": False})
+                    out = out[norm == value]
+                elif isinstance(value, (int, float)):
+                    numeric = pd.to_numeric(series, errors="coerce")
+                    out = out[numeric == float(value)]
+                else:
+                    out = out[series.astype(str).str.lower() == str(value).lower()]
+            if "min" in rule:
+                numeric = pd.to_numeric(out[col], errors="coerce")
+                out = out[numeric >= float(rule["min"])]
+            if "max" in rule:
+                numeric = pd.to_numeric(out[col], errors="coerce")
+                out = out[numeric <= float(rule["max"])]
+        return out
+
     # ---- helpers ---------------------------------------------------------
-    def _cheapest_ram(self, ddr, gb):
-        key = (ddr, gb)
+    def _cheapest_ram(self, ddr, gb, req=None):
+        pref_key = repr((getattr(req, "component_preferences", {}) or {}).get("ram", {}))
+        key = (ddr, gb, pref_key)
         if key not in self._ram_cache:
             r = self.d["ram"]
+            r = self._apply_preferences(r, "ram", req) if req is not None else r
             r = r[(r["ddr"] == ddr) & (r["total_gb"] == gb)]
             self._ram_cache[key] = None if len(r) == 0 else \
                 r.sort_values("price").iloc[0]
         return self._ram_cache[key]
 
     def _platform(self, cpu, req, ram_gb, min_tier):
-        key = (cpu["socket"], cpu["microarchitecture"], req.compact, ram_gb, min_tier)
+        pref_key = repr((getattr(req, "component_preferences", {}) or {}).get("mobo", {})) + repr((getattr(req, "component_preferences", {}) or {}).get("ram", {}))
+        key = (cpu["socket"], cpu["microarchitecture"], req.compact, ram_gb, min_tier, pref_key)
         if key not in self._plat_cache:
             self._plat_cache[key] = self._platform_uncached(cpu, req, ram_gb, min_tier)
         return self._plat_cache[key]
@@ -438,6 +498,7 @@ class BuildEngine:
     def _platform_uncached(self, cpu, req, ram_gb, min_tier):
         """Cheapest (board, ram) pair compatible with the CPU, or None."""
         b = self.d["mobo"]
+        b = self._apply_preferences(b, "mobo", req)
         b = b[(b["socket"] == cpu["socket"]) & (b["tier"] >= min_tier)]
         b = b.loc[b["chipset_code"].map(lambda c: chipset_supports_cpu(
             c, cpu["microarchitecture"], cpu["socket"])).astype(bool)]
@@ -446,7 +507,7 @@ class BuildEngine:
         b = b[(b["max_mem"] >= ram_gb) & (b["slots"] >= 2)]
         best = None
         for ddr in b["ddr"].unique():
-            ram = self._cheapest_ram(int(ddr), ram_gb)
+            ram = self._cheapest_ram(int(ddr), ram_gb, req)
             if ram is None:
                 continue
             board = b[b["ddr"] == ddr].sort_values("price").iloc[0]
@@ -455,31 +516,36 @@ class BuildEngine:
                 best = (tot, board, ram)
         return best
 
-    def _case(self, ff, compact):
+    def _case(self, ff, compact, req=None):
         c = self.d["case"]
+        c = self._apply_preferences(c, "case", req) if req is not None else c
         c = c[c["type"].isin(CASE_SUPPORT[ff])]
         if compact:
             c = c[c["type"].isin(COMPACT_CASES)]
         return None if len(c) == 0 else c.sort_values("price").iloc[0]
 
-    def _ssd(self, gb):
+    def _ssd(self, gb, req=None):
         s = self.d["ssd"]
+        s = self._apply_preferences(s, "ssd", req) if req is not None else s
         s = s[(s["capacity"] >= gb) & (s["capacity"] <= gb * 2.1)]
         return None if len(s) == 0 else s.sort_values("price").iloc[0]
 
-    def _psu(self, watts, min_eff):
-        key = (watts, min_eff)
+    def _psu(self, watts, min_eff, req=None):
+        pref_key = repr((getattr(req, "component_preferences", {}) or {}).get("psu", {}))
+        key = (watts, min_eff, pref_key)
         if key not in self._psu_cache:
             p = self.d["psu"]
+            p = self._apply_preferences(p, "psu", req) if req is not None else p
             p = p[(p["watt"] >= watts) & (p["eff"] >= min_eff)]
             self._psu_cache[key] = None if len(p) == 0 else \
                 p.sort_values("price").iloc[0]
         return self._psu_cache[key]
 
-    def _cooler(self, cpu):
+    def _cooler(self, cpu, req=None):
         if not cpu["needs_cooler"]:
             return None
         c = self.d["cooler"]
+        c = self._apply_preferences(c, "cooler", req) if req is not None else c
         floor = 40 if cpu["tdp"] >= 125 else 20
         c = c[c["price"] >= floor]
         return None if len(c) == 0 else c.sort_values("price").iloc[0]
@@ -496,6 +562,7 @@ class BuildEngine:
                 cap = min(cap, 60)
             if e == "monitor":
                 m = self.d["monitor"]
+                m = self._apply_preferences(m, "monitor", req)
                 m = m[m["price"] <= cap]
                 if req.use_case == "office" or req.use_case == "general":
                     m = m[m["hz"] >= 60]
@@ -510,6 +577,7 @@ class BuildEngine:
                     out["monitor"] = m.loc[score.idxmax()]
             elif e == "keyboard":
                 k = self.d["keyboard"]
+                k = self._apply_preferences(k, "keyboard", req)
                 k = k[(k["price"] <= cap) & ~k["name"].str.contains(
                     "combo|kit|set|bundle", case=False)]
                 if req.use_case in ("gaming", "streaming") and \
@@ -520,6 +588,7 @@ class BuildEngine:
                     out["keyboard"] = k.loc[i]
             elif e == "mouse":
                 m = self.d["mouse"]
+                m = self._apply_preferences(m, "mouse", req)
                 m = m[(m["price"] <= cap) & m["dpi"].notna()]
                 if req.use_case in ("gaming", "streaming") and (m["dpi"] >= 8000).any():
                     m = m[m["dpi"] >= 8000]
@@ -550,15 +619,15 @@ class BuildEngine:
         if not req.storage_gb and core_budget < 700:
             ssd_gb = 500
 
-        ssd = self._ssd(ssd_gb) if ssd_gb else None
+        ssd = self._ssd(ssd_gb, req) if ssd_gb else None
         if ssd is None:
             return dict(ok=False, requirement=req, message="No SSD meets the requested capacity in this catalogue.")
 
-        cpus = self.d["cpu"]
+        cpus = self._apply_preferences(self.d["cpu"], "cpu", req)
         if req.cpu_brand in ("amd", "intel"):
             cpus = cpus[cpus["brand"] == req.cpu_brand]
 
-        gpus = self.d["gpu"]
+        gpus = self._apply_preferences(self.d["gpu"], "gpu", req)
         if req.gpu_brand in ("nvidia", "amd", "intel"):
             gpus = gpus[gpus["brand"] == req.gpu_brand]
         if req.use_case == "ai_ml":
@@ -621,10 +690,10 @@ class BuildEngine:
             if plat is None:
                 continue
             _, board, ram = plat
-            case = self._case(board["form_factor"], req.compact)
+            case = self._case(board["form_factor"], req.compact, req)
             if case is None:
                 continue
-            cooler = self._cooler(cpu)
+            cooler = self._cooler(cpu, req)
             if cpu["needs_cooler"] and cooler is None:
                 continue
             fixed = (cpu["price"] + board["price"] + ram["price"]
@@ -635,7 +704,7 @@ class BuildEngine:
                     continue
                 gtdp = 0 if gpu is None else gpu["tdp"]
                 watts = psu_required_watts(cpu["tdp"], gtdp)
-                psu = self._psu(watts, 4 if gtdp >= 250 else 2)
+                psu = self._psu(watts, 4 if gtdp >= 250 else 2, req)
                 if psu is None:
                     continue
                 total = fixed + psu["price"] + (0 if gpu is None else gpu["price"])
@@ -682,7 +751,7 @@ class BuildEngine:
         # 1) PSU -> gold if affordable
         cur = parts["psu"]
         if cur["eff"] < 4:
-            alt = self._psu(watts, 4)
+            alt = self._psu(watts, 4, req)
             if alt is not None and alt["price"] - cur["price"] <= left * 0.5:
                 left -= alt["price"] - cur["price"]
                 parts["psu"] = alt
@@ -691,7 +760,7 @@ class BuildEngine:
         for nxt in (500, 1000, 2000, 4000):
             if nxt <= ssd_gb:
                 continue
-            alt = self._ssd(nxt)
+            alt = self._ssd(nxt, req)
             if alt is not None and alt["price"] - parts["ssd"]["price"] <= left * 0.6:
                 left -= alt["price"] - parts["ssd"]["price"]
                 parts["ssd"] = alt
@@ -699,7 +768,7 @@ class BuildEngine:
             break
         # 3) RAM -> 32 GB if on 16
         if ram_gb == 16 and not req.ram_gb:
-            ram = self._cheapest_ram(int(parts["ram"]["ddr"]), 32)
+            ram = self._cheapest_ram(int(parts["ram"]["ddr"]), 32, req)
             if ram is not None and ram["price"] - parts["ram"]["price"] <= left * 0.8 \
                     and parts["mobo"]["max_mem"] >= 32:
                 left -= ram["price"] - parts["ram"]["price"]
@@ -709,6 +778,7 @@ class BuildEngine:
         if req.use_case in ("gaming", "streaming"):
             ff = parts["mobo"]["form_factor"]
             c = self.d["case"]
+            c = self._apply_preferences(c, "case", req)
             c = c[c["type"].isin(CASE_SUPPORT[ff]) & (c["side_panel"] == "Tempered Glass")]
             if req.compact:
                 c = c[c["type"].isin(COMPACT_CASES)]
@@ -733,7 +803,10 @@ class BuildEngine:
             items.append(dict(category=k, name=r["name"],
                               price_usd=float(r["price"]),
                               price_myr=float(r["price"]) * USD_TO_MYR,
-                              spec=self._spec(k, r)))
+                              spec=self._spec(k, r),
+                              attributes={col: (None if pd.isna(val) else val.item() if hasattr(val, "item") else val)
+                                          for col, val in r.items()
+                                          if col not in {"price"} and not pd.isna(val)}))
         warnings = []
         if (req.budget_strategy == "closest_to_budget"
                 and req.use_case in ("office", "general", "programming")
@@ -758,8 +831,8 @@ class BuildEngine:
         if not b["ddr_confirmed"]:
             warnings.append("Memory type of the motherboard was inferred from its "
                             "chipset; verify DDR4/DDR5 on the manufacturer page.")
-        warnings.append("CPU-cooler socket support and GPU length vs case "
-                        "clearance are not in the dataset - verify before buying.")
+        warnings.append("CPU-cooler socket support, AIO radiator mounting, and GPU length vs case "
+                        "clearance are not fully verified by this dataset - confirm with manufacturers.")
         return dict(ok=True, requirement=req, items=items,
                     total_usd=total, total_myr=total * USD_TO_MYR,
                     budget_myr=req.budget_usd * USD_TO_MYR,

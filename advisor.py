@@ -1,32 +1,74 @@
-"""Deployment layer; rule mode has no dependency on model downloads."""
+"""PC Build Advisor orchestration: NLU extraction + catalogue-aware preferences."""
 from pathlib import Path
 import threading
-import re
 import pc_engine as E
 import nlu_data as N
+import catalog_nlu as C
 
 ROOT = Path(__file__).resolve().parent
-MODEL = 'facebook/opt-125m'
-BASELINE = 'Rule-based baseline'
-PRETRAINED = 'Pretrained OPT-125M (few-shot)'
-FINETUNED = 'Fine-tuned OPT-125M (LoRA)'
+MODEL = "facebook/opt-125m"
+DEFAULT_BUDGET_MYR = 4000
+BASELINE = "Rule-based baseline"
+PRETRAINED = "Pretrained OPT-125M"
+FINETUNED = "Fine-tuned OPT-125M (LoRA)"
 
 
-def adapter_ready(kind='extract'):
-    folder = ROOT / 'adapters' / f'{kind}_125m'
-    return (folder / 'adapter_config.json').is_file() and any(
-        (folder / name).is_file() for name in ('adapter_model.safetensors', 'adapter_model.bin'))
+def adapter_ready(kind="extract"):
+    folder = ROOT / "adapters" / f"{kind}_125m"
+    return (folder / "adapter_config.json").is_file() and any(
+        (folder / name).is_file()
+        for name in ("adapter_model.safetensors", "adapter_model.bin")
+    )
 
 
 def available_modes():
-    return ([FINETUNED] if adapter_ready() else []) + [BASELINE, PRETRAINED]
+    modes = [BASELINE, PRETRAINED]
+    if adapter_ready("extract"):
+        modes.append(FINETUNED)
+    return modes
 
 
 def load_engine():
-    return E.BuildEngine(E.load_data(ROOT / 'csv'))
+    return E.BuildEngine(E.load_data(ROOT / "csv"))
+
+
+def _explicit_core_fields(text):
+    """Deterministic extraction for high-impact fields from the original text."""
+    corrected, _ = C.correct_typos(text)
+    rules = N.normalise(N.rule_extract(corrected))
+    budget = N.extract_budget_amount(corrected)
+    if budget:
+        rules["budget"], rules["currency"] = budget
+        rules["budget_is_default"] = False
+    else:
+        rules["budget"] = DEFAULT_BUDGET_MYR
+        rules["currency"] = "MYR"
+        rules["budget_is_default"] = True
+    # Ensure model-only guesses do not become user-stated constraints.
+    rules["ram_gb"] = rules.get("ram_gb") if re_search(r"\b(?:ram|memory|ddr[45])\b", corrected) else None
+    rules["storage_gb"] = rules.get("storage_gb") if re_search(r"\b(?:ssd|storage|nvme|hard drive)\b", corrected) else None
+    return rules, corrected
+
+
+def re_search(pattern, text):
+    import re
+    return re.search(pattern, str(text), flags=re.I) is not None
+
+
+def rule_requirements(text, data=None):
+    """Rule-based baseline plus catalogue-derived component attribute parsing."""
+    corrected, typo_changes = C.correct_typos(text)
+    rules, corrected = _explicit_core_fields(corrected)
+    preferences, corrected, _ = C.extract_component_preferences(corrected, data or {})
+    rules["component_preferences"] = preferences
+    rules["typo_corrections"] = typo_changes
+    rules["corrected_text"] = corrected
+    rules["attribute_count"] = sum(len(v) for v in preferences.values())
+    return rules
 
 
 class ModelSession:
+    """Lazy-loaded OPT-125m requirement extractor."""
     def __init__(self, mode):
         import opt_nlu as O
         import torch
@@ -35,108 +77,84 @@ class ModelSession:
         self.lock = threading.RLock()
         torch.set_num_threads(min(2, torch.get_num_threads()))
         if mode == FINETUNED:
-            if not adapter_ready():
-                raise FileNotFoundError('No complete extract_125m adapter was supplied.')
-            self.tok, self.model = O.load_finetuned(MODEL, str(ROOT / 'adapters' / 'extract_125m'))
-            self.shots = None
+            if not adapter_ready("extract"):
+                raise FileNotFoundError("No complete adapters/extract_125m adapter was supplied.")
+            self.tok, self.model = O.load_finetuned(
+                MODEL, str(ROOT / "adapters" / "extract_125m")
+            )
         elif mode == PRETRAINED:
             self.tok, self.model = O.load_opt(MODEL)
-            self.shots = _pretrained_budget_neutral_shots()
         else:
-            raise ValueError('Unknown OPT mode')
+            raise ValueError("Unknown OPT mode")
 
-    def extract(self, text):
+    def extract(self, text, data=None):
+        corrected, typo_changes = C.correct_typos(text)
+        rules = rule_requirements(corrected, data)
         with self.lock:
             preds, _, raw = self.O.run_extraction(
-                self.model, self.tok, [text], shots=self.shots, batch_size=1
+                self.model, self.tok, [corrected], shots=None, batch_size=1
             )
 
-        # Parse model output first; deterministic user-text parsing then takes
-        # precedence for high-impact numeric constraints such as the budget.
-        if preds[0] is None or not any(key in preds[0] for key in N.KEYS):
-            return rule_requirements(text), 'Rule-based fallback: OPT did not return usable JSON.', raw[0]
+        model_prediction = N.normalise(preds[0]) if preds and preds[0] else {}
+        # Start with model interpretation, then use the user's explicit wording
+        # as authoritative. Unmentioned fields are filled with application defaults.
+        req = dict(model_prediction)
+        for key in ("use_case", "cpu_brand", "gpu_brand", "ram_gb",
+                    "storage_gb", "extras", "compact"):
+            req[key] = rules.get(key)
+        req["budget"] = rules["budget"]
+        req["currency"] = rules["currency"]
+        req["budget_is_default"] = rules["budget_is_default"]
+        req["component_preferences"] = rules["component_preferences"]
+        req["typo_corrections"] = typo_changes
+        req["corrected_text"] = corrected
+        req["attribute_count"] = rules["attribute_count"]
 
-        req = N.normalise(preds[0])
-        rules = rule_requirements(text)
-        parsed_budget = rules.get('budget')
-        changed = False
+        # Keep the model's use-case inference only if the deterministic baseline
+        # could not identify a more specific use case, and the message contains
+        # a use-case cue rather than being completely silent.
+        if rules["use_case"] == "general" and model_prediction.get("use_case") in E.USE_CASES:
+            if re_search(r"\b(?:gaming|stream|editing|programming|coding|office|ai|machine learning)\b", corrected):
+                req["use_case"] = model_prediction["use_case"]
+            else:
+                req["use_case"] = "general"
 
-        if parsed_budget is not None:
-            # Explicit amount found in the user's own sentence: always trust it.
-            changed = (req['budget'], req['currency']) != (parsed_budget, rules['currency'])
-            req['budget'] = parsed_budget
-            req['currency'] = rules['currency']
-            budget_note = 'user amount verified'
-        elif self.mode == FINETUNED and N.has_budget_mention(text) and req.get('budget'):
-            # Preserve a fine-tuned model's valid extraction only when the user
-            # clearly mentioned a budget but used a format the parser missed.
-            # The review form still lets the user verify/correct this value.
-            budget_note = 'fine-tuned model budget; please verify'
-        else:
-            # Pretrained few-shot OPT is prone to copying demo amounts (e.g. 9700).
-            # Never accept its invented budget when deterministic parsing failed.
-            changed = req.get('budget') is not None
-            req['budget'] = None
-            req['currency'] = rules.get('currency', 'MYR')
-            budget_note = 'budget not detected; enter it in the review form'
-
-        source = self.mode
-        if changed:
-            source += ' + deterministic budget correction'
-        if budget_note == 'fine-tuned model budget; please verify':
-            source += ' + model budget fallback (verify)'
-        elif budget_note == 'budget not detected; enter it in the review form':
-            source += ' + budget not detected'
-        return req, source, raw[0]
+        has_json = bool(preds and preds[0] is not None)
+        source = self.mode if has_json else self.mode + " + rule fallback"
+        if not has_json:
+            source += " (model returned invalid JSON)"
+        return req, source, raw[0] if raw else ""
 
 
-
-def _pretrained_budget_neutral_shots():
-    """Few-shot examples teach fields/use cases without exposing sample prices.
-
-    This reduces the chance that pretrained OPT copies a demonstration budget
-    such as RM9,700 into a new user's request.
-    """
-    examples = [
-        (
-            "I need a gaming PC with Intel CPU, NVIDIA graphics and 32GB RAM.",
-            {"use_case": "gaming", "cpu_brand": "intel", "gpu_brand": "nvidia", "ram_gb": 32},
-        ),
-        (
-            "Please suggest a PC for video editing with an AMD processor and 64GB RAM.",
-            {"use_case": "video_editing", "cpu_brand": "amd", "ram_gb": 64},
-        ),
-        (
-            "I want a compact office computer with a monitor and keyboard.",
-            {"use_case": "office", "extras": ["monitor", "keyboard"], "compact": True},
-        ),
-        (
-            "Build a programming workstation with an Intel CPU and 1TB SSD.",
-            {"use_case": "programming", "cpu_brand": "intel", "storage_gb": 1000},
-        ),
-    ]
-    return [(text, N.normalise(label)) for text, label in examples]
+def analyse_requirements(text, data, mode=BASELINE, model_session=None):
+    """One entry point used by Streamlit; returns req, source, raw, field report."""
+    if mode == BASELINE:
+        req = rule_requirements(text, data)
+        source, raw = BASELINE, None
+    else:
+        if model_session is None:
+            model_session = ModelSession(mode)
+        req, source, raw = model_session.extract(text, data)
+    report = C.requirement_field_report(data, req.get("component_preferences", {}), req)
+    return req, source, raw, report
 
 
-def rule_requirements(text):
-    """Deterministic requirements parsed directly from the user's message."""
-    text = str(text or "")
-    req = N.normalise(N.rule_extract(text))
-    budget_info = N.extract_budget_amount(text)
-    if budget_info is not None:
-        req['budget'], req['currency'] = budget_info
-    return req
-
-
-
-def baseline_extract(text):
-    return rule_requirements(text), BASELINE, None
+def baseline_extract(text, data=None):
+    req = rule_requirements(text, data)
+    return req, BASELINE, None
 
 
 def recommend(engine, req):
-    req = N.normalise(req)
-    if not req['budget']:
-        return {'ok': False, 'message': 'Please specify a positive budget.'}, []
-    result = engine.recommend(req)
-    violations = E.validate_build(result, engine.d) if result['ok'] else []
+    """Preserve extracted catalogue preferences while normalising core NLU fields."""
+    original = dict(req or {})
+    norm = N.normalise(original)
+    norm["component_preferences"] = original.get("component_preferences") or {}
+    norm["budget_strategy"] = original.get("budget_strategy", "closest_to_budget")
+    norm["budget_is_default"] = bool(original.get("budget_is_default", False))
+    if original.get("budget") is not None:
+        norm["budget"] = original["budget"]
+    if original.get("currency"):
+        norm["currency"] = original["currency"]
+    result = engine.recommend(norm)
+    violations = E.validate_build(result, engine.d) if result["ok"] else []
     return result, violations

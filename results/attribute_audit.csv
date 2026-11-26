@@ -1,0 +1,99 @@
+component,attribute,description,cleaned_column,type,available_after_cleaning
+cpu,name,CPU model/name,name,text,True
+cpu,price,CPU maximum price (USD dataset price),price,number,True
+cpu,core_count,CPU core count,cores,number,True
+cpu,core_clock,CPU base clock (GHz),core_clock,number,True
+cpu,boost_clock,CPU boost clock (GHz),boost_clock,number,True
+cpu,microarchitecture,CPU microarchitecture,microarchitecture,choice,True
+cpu,tdp,CPU TDP (W),tdp,number,True
+cpu,graphics,Integrated graphics model,graphics,choice,True
+cpu,socket,CPU socket (derived),socket,choice,True
+cpu,brand,CPU brand (derived),brand,choice,True
+cpu,has_igpu,Integrated graphics available (derived),has_igpu,bool,True
+gpu,name,GPU model/name,name,text,True
+gpu,price,GPU maximum price (USD dataset price),price,number,True
+gpu,chipset,GPU chipset,chipset,choice,True
+gpu,memory,GPU VRAM (GB),memory,number,True
+gpu,core_clock,GPU core clock (MHz),core_clock,number,True
+gpu,boost_clock,GPU boost clock (MHz),boost_clock,number,True
+gpu,color,GPU colour,color,choice,True
+gpu,length,GPU length (mm),length,number,True
+gpu,brand,GPU brand (derived),brand,choice,True
+mobo,name,Motherboard model/name,name,text,True
+mobo,price,Motherboard maximum price (USD dataset price),price,number,True
+mobo,socket,Motherboard CPU socket,socket,choice,True
+mobo,form_factor,Motherboard form factor,form_factor,choice,True
+mobo,max_memory,Motherboard maximum memory (GB),max_memory,number,True
+mobo,memory_slots,Motherboard memory slots,memory_slots,number,True
+mobo,color,Motherboard colour,color,choice,True
+mobo,chipset_code,Motherboard chipset (derived),chipset_code,choice,True
+mobo,ddr,Supported DDR generation (derived),ddr,number,True
+ram,name,RAM model/name,name,text,True
+ram,price,RAM maximum price (USD dataset price),price,number,True
+ram,speed,RAM speed field,speed,text,True
+ram,modules,RAM module configuration,modules,text,True
+ram,price_per_gb,RAM price per GB,price_per_gb,number,True
+ram,color,RAM colour,color,choice,True
+ram,first_word_latency,RAM first-word latency,first_word_latency,number,True
+ram,cas_latency,RAM CAS latency,cas_latency,number,True
+ram,ddr,RAM DDR generation (derived),ddr,number,True
+ram,mhz,"RAM speed (MT/s, derived)",mhz,number,True
+ram,n_mod,RAM number of modules (derived),n_mod,number,True
+ram,gb_each,RAM GB per module (derived),gb_each,number,True
+ram,total_gb,RAM total capacity (derived),total_gb,number,True
+ssd,name,Storage model/name,name,text,True
+ssd,price,Storage maximum price (USD dataset price),price,number,True
+ssd,capacity,Storage capacity (GB),capacity,number,True
+ssd,price_per_gb,Storage price per GB,price_per_gb,number,True
+ssd,type,Storage type,type,choice,True
+ssd,cache,Storage cache (MB),cache,number,True
+ssd,form_factor,Storage form factor,form_factor,choice,True
+ssd,interface,Storage interface,interface,choice,True
+psu,name,PSU model/name,name,text,True
+psu,price,PSU maximum price (USD dataset price),price,number,True
+psu,type,PSU form/type,type,choice,True
+psu,efficiency,PSU efficiency rating,efficiency,choice,True
+psu,wattage,PSU wattage (W),wattage,number,True
+psu,modular,PSU modularity,modular,choice,True
+psu,color,PSU colour,color,choice,True
+psu,watt,PSU wattage (derived),watt,number,True
+psu,eff,PSU efficiency rank (derived),eff,number,True
+case,name,PC case model/name,name,text,True
+case,price,Case maximum price (USD dataset price),price,number,True
+case,type,Case type/form factor,type,choice,True
+case,color,Case colour,color,choice,True
+case,psu,Included PSU wattage,psu,number,True
+case,side_panel,Case side panel,side_panel,choice,True
+case,external_volume,Case external volume,external_volume,number,True
+case,internal_35_bays,Internal 3.5-inch bays,internal_35_bays,number,True
+cooler,name,CPU cooler model/name,name,text,True
+cooler,price,Cooler maximum price (USD dataset price),price,number,True
+cooler,rpm,Cooler fan RPM source range,rpm,text,True
+cooler,rpm_max,Cooler maximum fan RPM (derived),rpm_max,number,True
+cooler,noise_level,Cooler noise source range,noise_level,text,True
+cooler,noise_max,Cooler maximum noise level (derived),noise_max,number,True
+cooler,color,Cooler colour,color,choice,True
+cooler,size,Cooler radiator size (mm),size,number,True
+monitor,name,Monitor model/name,name,text,True
+monitor,price,Monitor maximum price (USD dataset price),price,number,True
+monitor,screen_size,Monitor screen size (inches),screen_size,number,True
+monitor,resolution,Monitor resolution,resolution,choice,True
+monitor,refresh_rate,Monitor refresh rate (Hz),refresh_rate,number,True
+monitor,response_time,Monitor response time (ms),response_time,number,True
+monitor,panel_type,Monitor panel type,panel_type,choice,True
+monitor,aspect_ratio,Monitor aspect ratio,aspect_ratio,choice,True
+keyboard,name,Keyboard model/name,name,text,True
+keyboard,price,Keyboard maximum price (USD dataset price),price,number,True
+keyboard,style,Keyboard style,style,choice,True
+keyboard,switches,Keyboard switch type,switches,choice,True
+keyboard,backlit,Keyboard backlight,backlit,choice,True
+keyboard,tenkeyless,Tenkeyless (TKL),tenkeyless,bool,True
+keyboard,connection_type,Keyboard connection,connection_type,choice,True
+keyboard,color,Keyboard colour,color,choice,True
+mouse,name,Mouse model/name,name,text,True
+mouse,price,Mouse maximum price (USD dataset price),price,number,True
+mouse,tracking_method,Mouse tracking method,tracking_method,choice,True
+mouse,connection_type,Mouse connection,connection_type,choice,True
+mouse,max_dpi,Mouse maximum DPI,max_dpi,number,True
+mouse,hand_orientation,Mouse hand orientation,hand_orientation,choice,True
+mouse,color,Mouse colour,color,choice,True

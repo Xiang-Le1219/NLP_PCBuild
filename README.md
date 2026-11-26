@@ -1,62 +1,128 @@
 # PC Build Advisor using OPT
 
-BMDS2123 Natural Language Processing coursework prototype. Extracts natural-language PC requirements (English, Malay and Manglish), then recommends hardware using a budget-aware compatibility engine.
+A Natural Language Processing coursework prototype that converts English, Malay and Manglish PC-building requests into structured requirements, filters the supplied component catalogue, applies compatibility rules, and recommends a budget-aware PC build.
 
-## Deploy on Streamlit Community Cloud
+## Main features
 
-1. Extract the delivered ZIP. Upload its CONTENTS (including hidden `.streamlit` and `.gitignore` if using Git) to the root of a **private** GitHub repository. Do not upload the ZIP itself as the app. Check dataset licensing before uploading; no licence was provided in the supplied archive.
-2. Sign in at https://share.streamlit.io/ with GitHub and authorize access to that repository. Create an app from the repository.
-3. Select branch `main`, main file path `app.py`, and Python **3.11** in Advanced settings. Deploy.
-4. Start with the default rule-based mode. Choose pretrained OPT-125M in the sidebar to test few-shot inference (first use downloads weights; free CPU hosting may be too limited). A complete trained adapter automatically enables fine-tuned mode and becomes the default. If model loading or inference raises an exception, the app falls back to the baseline and labels it. Resource kills cannot necessarily be caught; use baseline mode or a larger host if that happens.
-5. Enter a request, analyse requirements, review/edit the extracted fields, and generate the build. The web app provides template explanations, not OPT-generated explanations.
+- **Catalogue-wide requirement analysis:** the app audits 98 raw and derived attributes from the 11 component catalogues included in `csv/` (CPU, GPU, motherboard, RAM, SSD, PSU, case, cooler, monitor, keyboard and mouse).
+- **User-stated requirements first:** explicitly mentioned requirements become filters. Unmentioned attributes remain `Auto / system default` and are selected by the workload profile and build engine.
+- **Typo-tolerant input:** common PC vocabulary mistakes (for example `wireles`, `motheboard`, `nvdia`, `keybord`, and `moniter`) are corrected before requirement extraction. Corrections are shown in the interface.
+- **Analysis duration:** the app displays how long requirement analysis took, including model loading on the first request.
+- **Three requirement-extraction approaches:** Rule-based baseline, original pretrained OPT-125M, and fine-tuned OPT-125M (LoRA).
+- **Two build strategies:** Closest under budget and Best value.
+- **Build validation:** checks the compatibility rules implemented in this prototype and reports when a stated preference cannot be satisfied by the catalogue.
+- **Experiment notebook:** compares the three extraction approaches using the same synthetic and out-of-distribution test sets.
 
-## Budget selection strategies
+The model selector changes **requirement extraction only**. The component selection, budget search and compatibility checks are handled by the same deterministic PC build engine in all three modes.
 
-The review form offers two build-selection strategies:
+## Repository structure
 
-- **Closest under budget (default):** searches compatible CPU/GPU combinations and selects the highest catalogue total that does not exceed the available component budget. For office/general/programming requests it may include a discrete GPU as an optional upgrade to use more of the budget; the app displays a warning about this.
-- **Best value:** retains workload-oriented selection and may leave substantial budget unused for light workloads, because an office PC does not necessarily benefit from expensive gaming hardware.
-
-The total is always constrained to be at or below the supplied budget under the engine's encoded prices and rules. Catalogue completeness and simplified compatibility assumptions still limit the result; a close-to-budget result is not a claim that the combination is objectively the best purchase.
-
-The sidebar's **Requirement extraction** selector has three possible modes: Rule-based baseline (regex/keywords), Pretrained OPT-125M (few-shot prompting), and Fine-tuned OPT-125M (LoRA requirement-extraction adapter). This selector affects requirement extraction only; the separate recommendation engine handles component selection. The currently displayed build explanation is a deterministic template, not OPT-generated text.
+```text
+PCBuild-OPT/
+├── app.py
+├── advisor.py
+├── pc_engine.py
+├── catalog_nlu.py
+├── nlu_data.py
+├── opt_nlu.py
+├── requirements.txt
+├── requirements-notebook.txt
+├── smoke_test.py
+├── test_budget_strategy.py
+├── csv/                         # 11 source component CSV files
+├── adapters/
+│   ├── extract_125m/             # Fine-tuned requirement-extraction LoRA adapter
+│   └── explain_125m/             # Explanation adapter artefact (not used by app inference)
+├── notebooks/
+│   └── PCBuild_OPT_Simplified.ipynb
+├── results/
+│   ├── attribute_audit.csv
+│   ├── cleaning_report.csv
+│   ├── model_comparison.csv
+│   ├── budget_strategy_test.csv
+│   ├── notebook_run_summary.json
+│   └── run_mode.txt
+└── .streamlit/
+    └── config.toml
+```
 
 ## Run locally
 
-Use Python 3.11 in a fresh virtual environment.
+Use Python 3.11 (recommended).
 
 ```bash
 python -m venv .venv
-# Activate the virtual environment for your OS before installing.
+# Activate the virtual environment for your OS.
 python -m pip install -r requirements.txt
 python smoke_test.py
 python test_budget_strategy.py
 streamlit run app.py
 ```
 
-The model dependency uses a CPU PyTorch wheel on Linux/Windows. The app does not need a GPU, API key, or model training at startup. The baseline does not load Torch or download models at runtime.
+Start in **Rule-based baseline** mode first. This mode does not download OPT weights and is the quickest way to verify data loading, requirement analysis and PC build generation.
 
-## Completing the OPT assignment experiment
+## Use the notebook and compare all three models
 
-The supplied `results/run_mode.txt` says **baseline**; no trained adapters were present. The CSV results are genuine supplied baseline results, not OPT results. Do not describe them as fine-tuned results.
+Open `notebooks/PCBuild_OPT_Simplified.ipynb` from the project folder in Jupyter or Google Colab.
 
-- Open `nlpass_completed.ipynb` in Colab, enable a GPU, provide the `csv/` directory or the original `csv.zip`. In setup select `RUN_MODE = "quick"` for a small OPT-125M training run; `RUN_MODE = "full"` for the complete three-model comparison.
-- Run all cells and download the newly generated `pc_advisor_results.zip`. Copy its `adapters/extract_125m/` folder into the repository `adapters/` directory, preserving the files and paths. If individual files exceed GitHub's web upload limit, use Git/Git LFS as appropriate, checking that the host retrieves the actual weights rather than pointer files.
-- Replace the `results/` CSVs and `run_mode.txt` with the newly exported actual experiment results. Keep the updated notebook as well. Commit and redeploy. The notebook retains explanation training/evaluation; the Streamlit deployment intentionally uses only extraction OPT and template explanations to reduce memory.
-- No GPU training is performed in the deployment. Pretrained few-shot OPT is not a substitute for trained/evaluated assignment results.
+In the setup cell:
 
-## Repository contents
+- `RUN_MODEL_EVALUATION = True` runs inference for original pretrained OPT-125M and fine-tuned OPT-125M, alongside the Rule-based baseline.
+- `RETRAIN_EXTRACT_ADAPTER = False` uses the supplied `adapters/extract_125m` adapter. Change it to `True` only if you intentionally want to train the adapter again on a CUDA GPU.
+- The pretrained model weights are downloaded from Hugging Face the first time they are needed. Internet access and sufficient memory are required.
 
-- `app.py`: Streamlit interface and session state
-- `advisor.py`: deployment model loading, fallback, requirement normalization and compatibility checking
-- `pc_engine.py`, `nlu_data.py`, `opt_nlu.py`: original project modules
-- `csv/`: 11 supplied component datasets
-- `adapters/`: instructions for adding trained weights
-- `results/`: unpacked baseline experiment outputs
-- `nlpass_completed.ipynb`: training and evaluation notebook
-- `requirements.txt`, `.streamlit/config.toml`, `.gitignore`: deployment configuration
-- `smoke_test.py`: offline functional test
+The notebook compares the same Synthetic and OOD tests using:
+- JSON-validity percentage
+- Exact-match accuracy
+- Mean field accuracy
+- Per-field accuracy (use case, budget, CPU/GPU brand, RAM and storage)
+- Seconds per example
 
-## Limitations and submission
+The notebook always writes rows for all three methods to `results/model_comparison.csv`. If a model cannot load or run, its rows are labelled **Not evaluated** rather than given invented scores. The Streamlit app displays this comparison file under **Model performance comparison**.
 
-Prices are catalogue estimates in USD converted using the notebook's fixed USD/MYR rate of 4.3, not current Malaysian prices. Compatibility checks cover only encoded rules; verify clearances, cooler mounting, BIOS and specifications before purchasing. Generated OPT requirements can be inaccurate; review the fields. Synthetic tests are not real-world validation. The supplied dataset source/licence is unverified; verify redistribution permission, keep coursework private and share only as authorized. Declare AI assistance, and retain your own understanding of the implementation.
+Run all notebook cells in order. The notebook is simplified to a single OPT-125M extraction comparison workflow; it does not automatically train multiple model sizes.
+
+## How defaults work
+
+Every field in the cleaned component schema is listed in the Streamlit **All dataset attributes** report.
+
+- **User-stated:** the system detected an explicit value and applies it as a catalogue filter.
+- **Default:** the user did not mention it, so the build engine selects an appropriate value automatically according to the usage profile, compatibility rules and budget strategy.
+- **Unavailable:** the field is not populated in the cleaned catalogue and cannot be used as a reliable filter.
+
+A default is not necessarily one fixed product value. For example, an unmentioned cooler is selected according to CPU requirements and the available catalogue.
+
+## Model choices in the Streamlit sidebar
+
+1. **Rule-based baseline:** regex, aliases, catalogue values and typo correction. Fast and explainable.
+2. **Pretrained OPT-125M:** the original OPT checkpoint, without PC-specific fine-tuning.
+3. **Fine-tuned OPT-125M (LoRA):** the base OPT-125M model plus the supplied requirement-extraction adapter.
+
+OPT can generate incorrect structured values. The application therefore gives explicit user input and catalogue-aware extraction priority over model guesses. Always review the extracted requirements before generating a build.
+
+## Deployment on Streamlit Community Cloud
+
+1. Upload the **contents** of this project folder to the root of a GitHub repository. Keep `app.py` and `requirements.txt` at the repository root.
+2. Ensure `.streamlit/config.toml`, `csv/`, `adapters/` and all root-level Python modules are also committed. Do not upload secrets.
+3. Sign in at https://share.streamlit.io/ using GitHub and create an app from the repository.
+4. Select branch `main`, main file path `app.py`, and Python 3.11 in Advanced settings.
+5. Deploy. Test Rule-based baseline first. Pretrained OPT downloads model weights on first use; CPU inference may be slow and can exceed free hosting resources.
+
+The supplied LoRA adapter files are included in `adapters/`. Do not upload Hugging Face cache folders or intermediate training checkpoints.
+
+## Known limitations
+
+- Prices are catalogue prices supplied in the CSV files. The prototype uses the fixed USD-to-MYR assumption in `pc_engine.py`; these are not live Malaysian retail prices.
+- Compatibility validation covers only the rules implemented in this prototype. It is not a substitute for checking BIOS support, cooler mounting, case clearances, PSU connectors and manufacturer specifications before purchasing.
+- A recommendation may fail when an explicitly requested attribute has no matching product in the available catalogue. The system should report this rather than silently ignoring the requirement.
+- OPT inference and LoRA training require additional compute and internet access. Live Streamlit hosting and full model inference should be tested in the target deployment environment.
+- Verify the original CSV data licence/redistribution terms before making the GitHub repository public. Keep it private if you do not have permission to redistribute the data.
+
+## Tests
+
+```bash
+python smoke_test.py
+python test_budget_strategy.py
+```
+
+These offline tests validate data loading, baseline requirement extraction, typo correction, selected catalogue attributes, default handling, budget constraints and the encoded compatibility rules. They do not download OPT weights or verify live hosting.
