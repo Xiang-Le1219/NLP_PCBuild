@@ -1,7 +1,5 @@
-model,test_set,seconds_per_example,json_valid_%,exact_match_%,use_case_%,budget_%,currency_%,cpu_brand_%,gpu_brand_%,ram_gb_%,storage_gb_%,extras_%,compact_%,mean_field_acc_%,status
-Rule-based baseline,Synthetic,0.00041501333332689684,100.0,96.66666666666667,100.0,100.0,96.66666666666667,100.0,100.0,100.0,100.0,100.0,100.0,99.62962962962962,Evaluated
-Rule-based baseline,OOD,0.00026429021621683006,100.0,70.27027027027027,75.67567567567568,94.5945945945946,94.5945945945946,100.0,100.0,100.0,100.0,100.0,100.0,96.0960960960961,Evaluated
-Pretrained OPT-125M,Synthetic,,,,,,,,,,,,,,Not evaluated
-Pretrained OPT-125M,OOD,,,,,,,,,,,,,,Not evaluated
-Fine-tuned OPT-125M,Synthetic,,,,,,,,,,,,,,Not evaluated
-Fine-tuned OPT-125M,OOD,,,,,,,,,,,,,,Not evaluated
+model,test_set,json_valid_%,exact_match_%,mean_field_acc_%,use_case_%,budget_%,cpu_brand_%,gpu_brand_%,ram_gb_%,storage_gb_%,seconds_per_example
+Rule-based baseline,synthetic,100.0,98.0,99.77777777777777,100.0,100.0,100.0,100.0,100.0,100.0,0.0
+Rule-based baseline,ood,100.0,70.27027027027027,96.0960960960961,75.67567567567568,94.5945945945946,100.0,100.0,100.0,100.0,0.0
+Pretrained OPT-125M,synthetic,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,6.705994648933411
+Pretrained OPT-125M,ood,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,6.62823959299036

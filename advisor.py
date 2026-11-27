@@ -29,7 +29,7 @@ def available_modes():
 
 
 def load_engine():
-    return E.BuildEngine(E.load_data(ROOT / "csv"))
+    return E.BuildEngine(E.load_processed_data(ROOT / "data" / "processed" / "engine"))
 
 
 def _explicit_core_fields(text):

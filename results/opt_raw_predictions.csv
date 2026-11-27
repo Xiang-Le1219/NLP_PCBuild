@@ -1,0 +1,463 @@
+model,test_set,input,raw_output
+Pretrained OPT-125M,synthetic,"Saya perlukan komputer baru untuk streaming. maksimum RM7,200, 2 TB NVMe!"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk streaming. maksimum RM7,200, 2 TB NVMe!"
+Pretrained OPT-125M,synthetic,Eh got any PC build for Premiere Pro and After Effects ah? 4200 ringgit la and Ryzen only; 2 TB NVMe thanks.," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Eh got any PC build for Premiere Pro and After Effects ah? 4200 ringgit la and Ryzen only; 2 TB NVMe thanks"
+Pretrained OPT-125M,synthetic,"Eh got any PC build for render video ah? budget around RM2,600 la"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Eh got any PC build for render video ah? budget around RM2,600 la
+JSON: use_case, budget, currency"
+Pretrained OPT-125M,synthetic,Saya nak build PC untuk spreadsheets and emails. 8gig memory; Radeon GPU and maksimum RM2700.," Use the JSON format to extract the PC requirements from the customer message.
+Message: Saya nak build PC untuk spreadsheets and emails. 8gig memory; Radeon GPU and maksimum RM2700.
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Saya nak build PC untuk spreadsheets and emails. 8gig memory; Radeon GPU and maksimum RM2700.
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Saya nak build PC untuk spreadsheets and emails. 8g"
+Pretrained OPT-125M,synthetic,"Hi ah, planning to build one PC for study one leh. RTX card. got tetikus or not; budget 11,800 only."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Hi ah, planning to build one PC for study one leh. RTX card. got tetikus or not; budget 11,"
+Pretrained OPT-125M,synthetic,"Saya perlukan komputer baru untuk kerja deep learning. maksimum RM10,800; 8gig memory"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk kerja deep learning. maksimum RM10,800; 8g"
+Pretrained OPT-125M,synthetic,"hi ah, planning to build one pc for video editing leh. budget around rm6900 la, 2 tb nvme, semua amd"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: hi ah, planning to build one pc for video editing leh. budget around rm6900 la, 2 tb nvme"
+Pretrained OPT-125M,synthetic,Looking to put together a desktop for Davinci Resolve. 1TB SSD and Budget RM8400 thanks.," Use the JSON format to extract the PC requirements from the customer message as JSON.
+Message: Looking to put together a desktop for Davinci Resolve. 1TB SSD and Budget RM8400 thanks.
+JSON: Use the JSON format to extract the PC requirements from the customer message as JSON.
+Message: Looking to put together a desktop for Davinci Resolve. 1TB SSD and Budget RM8400 thanks.
+JSON: Use the JSON format to extract the PC requirements from the customer message as JSON.
+Message: Looking to put together a desktop for Davinci Resolve. 1TB SSD and Budget RM"
+Pretrained OPT-125M,synthetic,"Boleh cadangkan PC untuk program Python? maksimum RM11,100, 16gig memory, 1 TB NVMe"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Boleh cadangkan PC untuk program Python? maksimum RM11,100, 16gig memory, 1 TB"
+Pretrained OPT-125M,synthetic,"Saya perlukan komputer baru untuk game Dota. bajet 10,100 ringgit, nak display and keyboard sekali. 16 GB of memory."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk game Dota. bajet 10,100 ringgit, nak display"
+Pretrained OPT-125M,synthetic,"Help me pick components for a game Dota PC. full AMD; around 2,200 dollars; SSD 2000GB"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Help me pick components for a game Dota PC. full AMD; around 2,200 dollars; SSD 2000GB
+JSON: use_"
+Pretrained OPT-125M,synthetic,"Bro can recommend PC for code Java or not? 8000 ringgit la. NVIDIA graphics, keyboard and mouse also can; 500GB SSD thanks."," Use JSON to extract the PC requirements from the customer message as JSON.
+Message: Bro can recommend PC for code Java or not? 8000 ringgit la. NVIDIA graphics, keyboard and mouse also can; 500GB SSD thanks.
+JSON: Use JSON to extract the PC requirements from the customer message as JSON.
+Message: Bro can recommend PC for code Java or not? 8000 ringgit la. NVIDIA graphics, keyboard and mouse also can; 500GB SSD thanks.
+JSON: Use JSON to extract the PC requirements from the customer message as JSON.
+Message: Bro can recommend PC for code Java or not? 8000 ringgit"
+Pretrained OPT-125M,synthetic,"Hi ah, planning to build one PC for main game leh. 16gig memory. 2 TB NVMe; RM15000 can ah!","
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON"
+Pretrained OPT-125M,synthetic,Need a computer for code Java. My budget is RM11k thanks.," Use the JSON format to extract the PC requirements from the customer message.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Need a computer for code Java. My budget is RM11k thanks.
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+IMPORTANT BUDGET RULES"
+Pretrained OPT-125M,synthetic,"looking to put together a desktop for main game. around 1,300 dollars. ssd 500gb!","
+""Hello, I'm looking for a desktop for main game. I have a GTX 970 and a GTX 980. I want to use the same card for both games. I have a GTX 970 and a GTX 980. I want to use the same card for both games. I have a GTX 970 and a GTX 980. I want to use the same card for both games. I have a GTX 970 and a GTX 980. I want to use the same card for both games. I have a GTX 970 and a GTX 980. I want to use the same card for both games. I have a GTX 970 and a GTX 980"
+Pretrained OPT-125M,synthetic,"Looking to put together a desktop for kerja Excel. My budget is RM1,800!"," Use the JSON format to create a spreadsheet.
+Message: I need to create a spreadsheet for kerja Excel. My budget is RM1,800!
+JSON: Use the JSON format to create a spreadsheet.
+Message: Looking to create a spreadsheet for kerja Excel. My budget is RM1,800!
+JSON: Use the JSON format to create a spreadsheet.
+Message: Looking to create a spreadsheet for kerja Excel. My budget is RM1,800!
+JSON: Use the JSON format to create a spreadsheet.
+Message: Looking to create a spreadsheet for kerja Excel. My budget is RM1,"
+Pretrained OPT-125M,synthetic,"Saya perlukan komputer baru untuk programming. bajet 11,400 ringgit, 64gig memory."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk programming. bajet 11,400 ringgit, 64gig memory"
+Pretrained OPT-125M,synthetic,"Looking to put together a desktop for gaming. 16gig memory and Budget RM1,700 and storage 500GB"," Use the JSON format to extract the PC requirements from the customer message.
+Message: Looking to put together a desktop for gaming. 16gig memory and Budget RM1,700 and storage 500GB
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Looking to put together a desktop for gaming. 16gig memory and Budget RM1,700 and storage 500GB
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Looking to put together a desktop for gaming. 16gig memory and Budget RM1,700 and storage 500GB
+JSON"
+Pretrained OPT-125M,synthetic,"Hi ah, planning to build one PC for playing Cyberpunk and Elden Ring leh. SSD 2000GB, keyboard and mouse also can, Ryzen only. 12,100 ringgit la","
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON:
+JSON"
+Pretrained OPT-125M,synthetic,"Hi ah, planning to build one PC for daily use leh. 32GB RAM. 2TB storage, 4600 ringgit la thanks."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Hi ah, planning to build one PC for daily use leh. 32GB RAM. 2TB storage, 4600 ringgit la"
+Pretrained OPT-125M,synthetic,"Tolong cadangkan komponen komputer untuk playing Valorant and CS2. under $1,400, 16gig memory!"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Tolong cadangkan komponen komputer untuk playing Valorant and CS2. under $1,400,"
+Pretrained OPT-125M,synthetic,"I want to build a PC for main game. not more than RM12,600; AMD GPU"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: I want to build a PC for main game. not more than RM12,600; AMD GPU
+JSON: use_case,"
+Pretrained OPT-125M,synthetic,Boleh cadangkan PC untuk deep learning? maksimum RM6800!," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Boleh cadangkan PC untuk deep learning? maksimum RM6800!
+JSON: use_case, budget"
+Pretrained OPT-125M,synthetic,saya nak build pc untuk guna rumah. bawah rm6200 and 500gb ssd. 16gig memory," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: saya nak build pc untuk guna rumah. bawah rm6200 and 500gb ssd. 16g"
+Pretrained OPT-125M,synthetic,Saya nak build PC untuk guna rumah. lebih kurang RM13600.," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya nak build PC untuk guna rumah. lebih kurang RM13600.
+JSON: use"
+Pretrained OPT-125M,synthetic,"Can you recommend PC parts for program Python? Intel chip please. under RM9,500. Radeon GPU!"," Use the JSON format to extract the PC requirements from the customer message.
+Message: Can you recommend PC parts for program Python? Intel chip please. under RM9,500. Radeon GPU!
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Can you recommend PC parts for program Python? Intel chip please. under RM9,500. Radeon GPU!
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Can you recommend PC parts for program Python? Intel chip please. under RM9,500. Radeon GPU!
+JSON: Use the"
+Pretrained OPT-125M,synthetic,"Can you recommend PC parts for everyday tasks? 2 TB NVMe. Intel CPU; My budget is RM1500, Intel Arc GPU; 32gig memory thanks."," Use JSON to extract the PC requirements from the customer message as JSON.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Can you recommend PC parts for everyday tasks? 2 TB NVMe. Intel CPU; My budget is RM1500, Intel Arc GPU; 32gig memory thanks.
+JSON: Use JSON to extract the PC"
+Pretrained OPT-125M,synthetic,Saya nak build PC untuk kerja Excel. nak mouse sekali and storage 1TB. maksimum RM8900!," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya nak build PC untuk kerja Excel. nak mouse sekali and storage 1TB. maksimum RM"
+Pretrained OPT-125M,synthetic,"can you recommend pc parts for office work? 64gig memory, under rm6,200. 500gb ssd thanks."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: can you recommend pc parts for office work? 64gig memory, under rm6,200. 500gb ssd thanks.
+"
+Pretrained OPT-125M,synthetic,"Help me pick components for a Premiere Pro and After Effects PC. 32gig memory. around RM10,500; include papan kekunci thanks."," Use the JSON format to extract the PC requirements from the customer message as JSON.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Help me pick components for a Premiere Pro and After Effects PC. 32gig memory. around RM10,500; include papan kekunci thanks.
+JSON: Use the JSON format to"
+Pretrained OPT-125M,synthetic,Saya perlukan komputer baru untuk spreadsheets and emails. maksimum RM3k and NVIDIA graphics and storage 500GB," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk spreadsheets and emails. maksimum RM3k and NVIDIA graphics and"
+Pretrained OPT-125M,synthetic,"Hi ah, planning to build one PC for playing AAA games leh. 2TB storage; 8gig memory. as small as possible and budget around RM8600 la","
+$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $"
+Pretrained OPT-125M,synthetic,"Eh got any PC build for streaming game ah? Intel Core processor, budget around RM7,600 la, Radeon GPU thanks."," Use the JSON format to extract the PC requirements from the customer message as JSON.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Eh got any PC build for streaming game ah? Intel Core processor, budget around RM7,600 la, Radeon GPU thanks.
+JSON: Use the JSON format to extract the PC requirements from the"
+Pretrained OPT-125M,synthetic,Eh got any PC build for spreadsheets and emails ah? budget around RM11800 la and 2 TB NVMe.," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Eh got any PC build for spreadsheets and emails ah? budget around RM11800 la and 2 TB NVMe.
+JSON:"
+Pretrained OPT-125M,synthetic,"Hi ah, planning to build one PC for running local LLMs leh. budget RM1800 only, 16gig memory"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Hi ah, planning to build one PC for running local LLMs leh. budget RM1800 only, 16gig memory
+JSON"
+Pretrained OPT-125M,synthetic,"Hi ah, planning to build one PC for normal use only leh. RTX card, monitor and mouse also can; budget around RM14400 la; 2 TB NVMe."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Hi ah, planning to build one PC for normal use only leh. RTX card, monitor and mouse also can; budget around RM"
+Pretrained OPT-125M,synthetic,Help me pick components for a basic use PC. My budget is RM9k and 16GB RAM and 1 TB NVMe," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Help me pick components for a basic use PC. My budget is RM9k and 16GB RAM and 1 TB NVMe
+JSON"
+Pretrained OPT-125M,synthetic,"Saya perlukan komputer baru untuk web development and Docker. maksimum RM10400. nak monitor, keyboard and mouse sekali; storage 500GB."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk web development and Docker. maksimum RM10400. nak monitor"
+Pretrained OPT-125M,synthetic,"Eh got any PC build for kerja Excel ah? around 1,300 dollars; AMD GPU. 32gig memory"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Eh got any PC build for kerja Excel ah? around 1,300 dollars; AMD GPU. 32gig memory
+JSON:"
+Pretrained OPT-125M,synthetic,"Can you recommend PC parts for program Python? 16GB RAM and under RM7700, storage 1TB"," Use the JSON format to extract the PC requirements from the customer message.
+Message: Can you recommend PC parts for program Python? 16GB RAM and under RM7700, storage 1TB
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Can you recommend PC parts for program Python? 16GB RAM and under RM7700, storage 1TB
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Can you recommend PC parts for program Python? 16GB RAM and under RM7700, storage 1TB
+JSON: Use the JSON format to"
+Pretrained OPT-125M,synthetic,Can you recommend PC parts for do assignment? not more than RM9000 thanks.," Use JSON to extract the PC requirements from the customer message as JSON.
+Message: Can you recommend PC parts for do assignment? not more than RM9000 thanks.
+JSON: Use JSON to extract the PC requirements from the customer message as JSON.
+Message: Can you recommend PC parts for do assignment? not more than RM9000 thanks.
+JSON: Use JSON to extract the PC requirements from the customer message as JSON.
+Message: Can you recommend PC parts for do assignment? not more than RM9000 thanks.
+JSON: Use JSON to extract the PC requirements from the customer message as JSON.
+Message:"
+Pretrained OPT-125M,synthetic,"Nak rakit PC untuk kerja office. ram 8g; maksimum RM9,100, Arc graphics thanks."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Nak rakit PC untuk kerja office. ram 8g; maksimum RM9,100, Arc graphics thanks."
+Pretrained OPT-125M,synthetic,Tolong cadangkan komponen komputer untuk Excel and Word. storage 500GB and maksimum RM9300!," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Tolong cadangkan komponen komputer untuk Excel and Word. storage 500GB and maksimum RM9300"
+Pretrained OPT-125M,synthetic,"Saya perlukan komputer baru untuk streaming on YouTube. bajet 5,500 ringgit thanks."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk streaming on YouTube. bajet 5,500 ringgit thanks.
+"
+Pretrained OPT-125M,synthetic,"tolong cadangkan komponen komputer untuk machine learning. amd everything, storage 1tb. bawah rm8800","
+""The following is a list of the requirements for a PC. The requirements are:
+CPU: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB of RAM
+RAM: 1TB"
+Pretrained OPT-125M,synthetic,"Wah need new PC for do assignment la. display, keyboard and tetikus also can. budget around RM7k la."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Wah need new PC for do assignment la. display, keyboard and tetikus also can. budget around RM7k la.
+"
+Pretrained OPT-125M,synthetic,Nak rakit PC untuk render video. maksimum RM4k thanks.," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Nak rakit PC untuk render video. maksimum RM4k thanks.
+JSON: use_case, budget,"
+Pretrained OPT-125M,synthetic,"Bro can recommend PC for latih model AI or not? 500GB SSD, 8GB RAM. 1,800 USD"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Bro can recommend PC for latih model AI or not? 500GB SSD, 8GB RAM. 1,800 USD
+JSON:"
+Pretrained OPT-125M,synthetic,"hi ah, planning to build one pc for davinci resolve leh. got monitor and keyboard or not, arc graphics. 32gig memory; budget around rm9300 la thanks."," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: hi ah, planning to build one pc for davinci resolve leh. got monitor and keyboard or not, arc graphics. 32"
+Pretrained OPT-125M,synthetic,Saya perlukan komputer baru untuk guna rumah. bawah RM3800. nak display sekali thanks.," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Saya perlukan komputer baru untuk guna rumah. bawah RM3800. nak display"
+Pretrained OPT-125M,ood,"my son wants a pc to play fortnite and minecraft, we can spend about rm3500"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: my son wants a pc to play fortnite and minecraft, we can spend about rm3500
+JSON: use_case"
+Pretrained OPT-125M,ood,"Looking for a workstation for Blender and Unreal Engine, 12k ringgit max, nvidia please"," Use the following JSON to extract the PC requirements from the customer message as JSON.
+Message: Looking for a workstation for Blender and Unreal Engine, 12k ringgit max, nvidia please
+JSON: Use the following JSON to extract the PC requirements from the customer message as JSON.
+Message: Looking for a workstation for Blender and Unreal Engine, 12k ringgit max, nvidia please
+JSON: Use the following JSON to extract the PC requirements from the customer message as JSON.
+Message: Looking for a workstation for Blender and Unreal Engine, 12k ringgit max, nvidia please
+JSON"
+Pretrained OPT-125M,ood,"recommend me a build for my office staff, excel and chrome only, rm 2000"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: recommend me a build for my office staff, excel and chrome only, rm 2000
+JSON: use_case, budget, currency,"
+Pretrained OPT-125M,ood,"I'd like to train small neural nets at home, budget 1800 usd, prefer nvidia"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: I'd like to train small neural nets at home, budget 1800 usd, prefer nvidia
+JSON: use_case, budget"
+Pretrained OPT-125M,ood,"boss, rm5000 got any good gaming pc? intel cpu and 32gb ram"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: boss, rm5000 got any good gaming pc? intel cpu and 32gb ram
+JSON: use_case, budget, currency,"
+Pretrained OPT-125M,ood,"pc untuk edit video tiktok, bajet 4 ribu","
+""The PC is a PC. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer. It is a computer."
+Pretrained OPT-125M,ood,"nak buat live stream dan main game, budget rm 6,500, nak monitor sekali"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: nak buat live stream dan main game, budget rm 6,500, nak monitor sekali
+JSON: use_"
+Pretrained OPT-125M,ood,"Can I get a decent PC for web dev around $1,200? AMD CPU please"," Use the JSON format to extract the PC requirements from the customer message.
+Message: Can I get a decent PC for web dev around $1,200? AMD CPU please
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Can I get a decent PC for web dev around $1,200? AMD CPU please
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Can I get a decent PC for web dev around $1,200? AMD CPU please
+JSON: Use the JSON format to extract the PC requirements from the customer message."
+Pretrained OPT-125M,ood,"budget RM 3k, just for browsing youtube and zoom meetings"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: budget RM 3k, just for browsing youtube and zoom meetings
+JSON: use_case, budget, currency, cpu_brand,"
+Pretrained OPT-125M,ood,"Need something small, mini itx, for gaming. rm4500."," Use the JSON format to extract the PC requirements from the customer message.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Need something small, mini itx, for gaming. rm4500.
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+IMPORTANT BUDGET RULES"
+Pretrained OPT-125M,ood,"pls recommend pc 2tb ssd 64gb ram for data science, rm 14000","
+""The following is a list of the requirements for a PC. The requirements are:
+1. The PC must be a Windows PC.
+2. The PC must be a Windows PC.
+3. The PC must be a Windows PC.
+4. The PC must be a Windows PC.
+5. The PC must be a Windows PC.
+6. The PC must be a Windows PC.
+7. The PC must be a Windows PC.
+8. The PC must be a Windows PC.
+9. The PC must be a Windows PC.
+10. The PC must be a Windows PC."
+Pretrained OPT-125M,ood,I have 8k to spend. want to edit 4k videos with keyboard and mouse included.," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: I have 8k to spend. want to edit 4k videos with keyboard and mouse included.
+JSON: use_case, budget"
+Pretrained OPT-125M,ood,"sis nak PC untuk kerja akaun, tak payah mahal, rm1800","
+$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $"
+Pretrained OPT-125M,ood,"gaming pc rm 2.5k, amd gpu"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: gaming pc rm 2.5k, amd gpu
+JSON: use_case, budget, currency, cpu_brand, g"
+Pretrained OPT-125M,ood,"Radeon only and ryzen, for playing Call of Duty, RM 6000"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Radeon only and ryzen, for playing Call of Duty, RM 6000
+JSON: use_case, budget, currency, cpu"
+Pretrained OPT-125M,ood,"Trying to spec a PC to run Llama locally, 3000 USD, 64GB of RAM"," Use the JSON format to extract the PC requirements from the customer message.
+Message: Trying to spec a PC to run Llama locally, 3000 USD, 64GB of RAM
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Trying to spec a PC to run Llama locally, 3000 USD, 64GB of RAM
+JSON: Use the JSON format to extract the PC requirements from the customer message.
+Message: Trying to spec a PC to run Llama locally, 3000 USD, 64GB of RAM
+JSON: Use the JSON format to extract the PC requirements from the customer message."
+Pretrained OPT-125M,ood,"student pc for assignments and Zoom classes, RM 2200"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: student pc for assignments and Zoom classes, RM 2200
+JSON: use_case, budget, currency, cpu_brand, g"
+Pretrained OPT-125M,ood,"wah my budget only 1.5k ah, can build gaming pc or not"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: wah my budget only 1.5k ah, can build gaming pc or not
+JSON: use_case, budget, currency"
+Pretrained OPT-125M,ood,"twitch streamer here, need a build, ten thousand ringgit, 1tb ssd","
+""Hello, I'm a streamer, I need a build, I need a ssd, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need a build, I need"
+Pretrained OPT-125M,ood,"Recommend a PC for coding and docker containers, 16GB RAM enough, RM4000"," Use the JSON standard to create a JSON file.
+Message: Recommend a PC for coding and docker containers, 16GB RAM enough, RM4000
+JSON: Use the JSON standard to create a JSON file.
+Message: Recommend a PC for coding and docker containers, 16GB RAM enough, RM4000
+JSON: Use the JSON standard to create a JSON file.
+Message: Recommend a PC for coding and docker containers, 16GB RAM enough, RM4000
+JSON: Use the JSON standard to create a JSON file.
+Message: Recommend a PC for coding and docker containers, 16GB RAM enough, RM4000
+JSON:"
+Pretrained OPT-125M,ood,"build for editing youtube vids, budget about 5000 myr, nvidia gpu"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: build for editing youtube vids, budget about 5000 myr, nvidia gpu
+JSON: use_case, budget, currency"
+Pretrained OPT-125M,ood,"cheap pc for my mom to watch netflix and facebook, below rm 1800"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: cheap pc for my mom to watch netflix and facebook, below rm 1800
+JSON: use_case, budget, currency, cpu"
+Pretrained OPT-125M,ood,"I want a high-end gaming rig, money is no object, about RM 20000"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: I want a high-end gaming rig, money is no object, about RM 20000
+JSON: use_case, budget,"
+Pretrained OPT-125M,ood,"Budget: 4,500 ringgit. Use: coding. Intel CPU + RTX 4060"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Budget: 4,500 ringgit. Use: coding. Intel CPU + RTX 4060
+JSON: use_case, budget,"
+Pretrained OPT-125M,ood,"pc game sekitar rm4k, ram 16gb, ssd 1tb","
+""Hello, I'm a new user and I want to create a game. I want to create a game with a budget of 5k. I want to create a game with a budget of 500k. I want to create a game with a budget of 500k. I want to create a game with a budget of 500k. I want to create a game with a budget of 500k. I want to create a game with a budget of 500k. I want to create a game with a budget of 500k. I want to create a game with a budget of 500k. I want to create a game with"
+Pretrained OPT-125M,ood,"need pc for rendering in 3ds max and v-ray, budget USD 2200"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: need pc for rendering in 3ds max and v-ray, budget USD 2200
+JSON: use_case, budget, currency"
+Pretrained OPT-125M,ood,"just a basic desktop for the shop counter, rm1600"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: just a basic desktop for the shop counter, rm1600
+JSON: use_case, budget, currency, cpu_brand, g"
+Pretrained OPT-125M,ood,"I stream on Twitch daily, 9000 MYR, with monitor keyboard and mouse"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: I stream on Twitch daily, 9000 MYR, with monitor keyboard and mouse
+JSON: use_case, budget, currency, cpu"
+Pretrained OPT-125M,ood,"Intel Arc GPU build for esports, 3000 ringgit"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Intel Arc GPU build for esports, 3000 ringgit
+JSON: use_case, budget, currency, cpu_brand, gpu"
+Pretrained OPT-125M,ood,"Fine-tune LLMs at home, RM 15000, Nvidia only"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Fine-tune LLMs at home, RM 15000, Nvidia only
+JSON: use_case, budget, currency, cpu"
+Pretrained OPT-125M,ood,Can you suggest a quiet PC for general use? budget $900," Use the JSON format to create a budget.
+Message: Can you suggest a quiet PC for general use? budget $900
+JSON: Use the JSON format to create a budget.
+Message: Can you suggest a quiet PC for general use? budget $900
+JSON: Use the JSON format to create a budget.
+Message: Can you suggest a quiet PC for general use? budget $900
+JSON: Use the JSON format to create a budget.
+Message: Can you suggest a quiet PC for general use? budget $900
+JSON: Use the JSON format to create a budget.
+Message: Can you suggest a"
+Pretrained OPT-125M,ood,"mak nak PC untuk tengok drama dan video call, bajet rm2k"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: mak nak PC untuk tengok drama dan video call, bajet rm2k
+JSON: use_case"
+Pretrained OPT-125M,ood,"program in C++ and run virtual machines, 32GB RAM, rm 5500"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: program in C++ and run virtual machines, 32GB RAM, rm 5500
+JSON: use_case, budget, currency,"
+Pretrained OPT-125M,ood,"1TB SSD for office use, rm2300","
+$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $"
+Pretrained OPT-125M,ood,Gaming PC under 3k with Nvidia," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Gaming PC under 3k with Nvidia
+JSON: use_case, budget, currency, cpu_brand, gpu_brand,"
+Pretrained OPT-125M,ood,"I'm into esports (Valorant), need a small PC, compact, budget RM 3500, ryzen"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: I'm into esports (Valorant), need a small PC, compact, budget RM 3500, ryzen
+JSON:"
+Pretrained OPT-125M,ood,"Computer for gaming and I also need a monitor, RM 6500"," use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, storage_gb, extras, compact.
+IMPORTANT BUDGET RULES: Copy a budget only when the message explicitly states one. Interpret shorthand such as '5k', 'RM5k', or 'around 5k' as 5000. If no budget is explicitly stated, return budget: null. Never invent a budget or copy a numeric value from the examples.
+Message: Computer for gaming and I also need a monitor, RM 6500
+JSON: use_case, budget, currency, cpu_brand"

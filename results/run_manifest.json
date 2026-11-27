@@ -1,0 +1,25 @@
+{
+  "project": "PCBuild-OPT",
+  "source_csv_categories": 25,
+  "source_attribute_fields": 166,
+  "engine_components": [
+    "cpu",
+    "gpu",
+    "mobo",
+    "ram",
+    "ssd",
+    "psu",
+    "case",
+    "cooler",
+    "monitor",
+    "keyboard",
+    "mouse"
+  ],
+  "model_status": {
+    "pretrained": "Evaluated",
+    "finetuned": "Not evaluated"
+  },
+  "run_opt_experiments": true,
+  "retrain_finetuned_opt125m": true,
+  "generated_at": "2026-11-27 18:02:48"
+}

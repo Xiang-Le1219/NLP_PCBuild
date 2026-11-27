@@ -1,0 +1,5 @@
+input,corrected_text,component_preferences,correction_detected
+gamming pc with nvdia gpu and motheboard AM5,gaming pc with nvidia gpu and motherboard AM5,"{""gpu"": {""brand"": {""eq"": ""nvidia""}}, ""mobo"": {""socket"": {""eq"": ""AM5""}}}",True
+"wireles mouse, white ATX case, 32GB DDR5 RAM","wireless mouse, white ATX case, 32GB DDR5 RAM","{""ram"": {""total_gb"": {""min"": 32}, ""ddr"": {""eq"": 5}}, ""case"": {""type"": {""in"": [""ATX Mid Tower"", ""ATX Full Tower"", ""ATX Mini Tower""]}, ""color"": {""contains"": ""White""}}, ""mouse"": {""connection_type"": {""contains"": ""Wireless""}}}",True
+moniter 27 inch 144hz and keybord RGB,monitor 27 inch 144hz and keyboard RGB,"{""monitor"": {""screen_size"": {""min"": 27.0}, ""refresh_rate"": {""min"": 144.0}}, ""keyboard"": {""backlit"": {""eq"": ""RGB""}}}",True
+"liquid cooller 240mm, 750w gold psu","liquid cooler 240mm, 750w gold psu","{""psu"": {""wattage"": {""min"": 750.0}, ""efficiency"": {""contains"": ""gold""}}, ""cooler"": {""size"": {""eq"": 240.0}}}",True

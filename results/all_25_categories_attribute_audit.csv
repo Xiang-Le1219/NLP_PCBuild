@@ -1,0 +1,167 @@
+category,field,dtype,rows,missing_count,missing_pct,unique_values,sample_values
+case,color,object,6447,54,0.84,95,Black | White | Blue | Black / Brown
+case,external_volume,float64,6447,1325,20.55,751,45.0 | 51.8 | 55.9 | 33.6
+case,internal_35_bays,int64,6447,0,0.0,17,2 | 1 | 4 | 0
+case,name,object,6447,0,0.0,4213,Montech XR | Phanteks XT PRO | NZXT H5 Flow (2024) | Corsair 3500X ARGB
+case,price,float64,6447,5394,83.67,534,83.59 | 67.98 | 84.99 | 115.99
+case,psu,float64,6447,5934,92.04,41,750.0 | 650.0 | 850.0 | 300.0
+case,side_panel,object,6447,1939,30.08,5,Tempered Glass | Acrylic | Tinted Tempered Glass | Mesh
+case,type,object,6447,0,0.0,13,ATX Mid Tower | MicroATX Mini Tower | MicroATX Mid Tower | ATX Full Tower
+case-accessory,form_factor,float64,8,0,0.0,3,2.5 | 5.25 | 3.5
+case-accessory,name,object,8,0,0.0,8,NZXT HUE 2 RGB Lighting Kit | NZXT Hue+ | NZXT Aperture M | Vantec UGT-CR935
+case-accessory,price,float64,8,8,100.0,0,
+case-accessory,type,object,8,0,0.0,2,LED Controller | Card Reader
+case-fan,airflow,object,2565,111,4.33,962,"0,61.3 | 60.09 | 66.17 | 56.3"
+case-fan,color,object,2565,26,1.01,65,Black | White | White / Black | Brown
+case-fan,name,object,2565,0,0.0,1480,Lian Li Uni Fan SL-Infinity 3-Pack | Noctua NF-A12x25 PWM chromax.black.swap | Thermalright TL-C12C-S X3 3-Pack | ARCTIC P12 PWM PST
+case-fan,noise_level,object,2565,177,6.9,624,"0,29 | 22.6 | 25.6 | 10,36"
+case-fan,price,float64,2565,1569,61.17,509,89.99 | 37.95 | 87.99 | 13.59
+case-fan,pwm,bool,2565,0,0.0,2,True | False
+case-fan,rpm,object,2565,76,2.96,315,"450,2000 | 1550 | 200,1800 | 420,2100"
+case-fan,size,int64,2565,0,0.0,14,120 | 140 | 92 | 80
+cpu,boost_clock,float64,1180,538,45.59,39,5.2 | 5.0 | 5.3 | 5.4
+cpu,core_clock,float64,1180,0,0.0,50,4.7 | 4.2 | 3.9 | 4.5
+cpu,core_count,int64,1180,0,0.0,16,8 | 6 | 16 | 20
+cpu,graphics,object,1180,632,53.56,51,Radeon | Intel UHD Graphics 770 | Intel Xe | Radeon Vega 7
+cpu,microarchitecture,object,1180,0,0.0,35,Zen 5 | Zen 4 | Zen 3 | Raptor Lake Refresh
+cpu,name,object,1180,0,0.0,961,AMD Ryzen 7 9800X3D | AMD Ryzen 7 7800X3D | AMD Ryzen 5 7600X | AMD Ryzen 5 9600X
+cpu,price,float64,1180,637,53.98,449,451.5 | 340.05 | 170.49 | 204.99
+cpu,tdp,int64,1180,0,0.0,51,120 | 105 | 65 | 170
+cpu-cooler,color,object,2833,922,32.55,53,Black / Silver | Black | White | Brown / Silver
+cpu-cooler,name,object,2833,0,0.0,2326,Thermalright Peerless Assassin 120 SE | ARCTIC Liquid Freezer III Pro 360 | Cooler Master Hyper 212 Black Edition | Thermalright Phantom Spirit 120 SE ARGB
+cpu-cooler,noise_level,object,2833,285,10.06,673,"25.6 | 6.5,26 | 19.2,24.6 | 17.9,30.6"
+cpu-cooler,price,float64,2833,1888,66.64,577,34.9 | 84.99 | 25.99 | 37.9
+cpu-cooler,rpm,object,2833,149,5.26,308,"1550 | 600,3000 | 650,2000 | 1500"
+cpu-cooler,size,float64,2833,1545,54.54,6,360.0 | 240.0 | 280.0 | 420.0
+external-hard-drive,capacity,int64,644,0,0.0,32,20000 | 44000 | 5000 | 24000
+external-hard-drive,color,object,644,230,35.71,19,Black | Black / Orange | Black / Silver | Blue
+external-hard-drive,interface,object,644,10,1.55,22,"USB Type-A 3.2 Gen 1, USB Type-C 3.2 Gen 1 | USB Type-A 3.2 Gen 1 | USB Type-C 3.2 Gen 2x2 | USB Type-C 4.0 Gen 3x2"
+external-hard-drive,name,object,644,0,0.0,186,Apricorn Aegis Fortress L3 | Western Digital My Book Duo | Western Digital WD_BLACK P10 | Seagate Expansion
+external-hard-drive,price,float64,644,340,52.8,217,12999.0 | 1199.99 | 117.0 | 318.0
+external-hard-drive,price_per_gb,float64,644,348,54.04,148,0.65 | 0.027 | 0.023 | 0.013
+external-hard-drive,type,object,644,0,0.0,2,Portable | Desktop
+fan-controller,channel_wattage,float64,54,15,27.78,14,36.0 | 6.0 | 10.0 | 8.0
+fan-controller,channels,int64,54,0,0.0,7,10 | 4 | 3 | 8
+fan-controller,color,object,54,33,61.11,2,Black | White
+fan-controller,form_factor,object,54,15,27.78,3,"5.25 | 3.5 | 2,5.25"
+fan-controller,name,object,54,0,0.0,53,ARCTIC Case Fan Hub | Lian Li UNI HUB – SL Controller | NZXT RGB & Fan Controller (2022) | Thermalright TL-FAN and ARGB HUB x8
+fan-controller,price,float64,54,45,83.33,9,9.99 | 34.99 | 43.76 | 49.99
+fan-controller,pwm,bool,54,0,0.0,2,True | False
+headphones,color,object,2909,14,0.48,95,Black / Red | Silver / Brown | Black / Green | Black
+headphones,enclosure_type,object,2909,0,0.0,3,Closed | Open | Semi-open
+headphones,frequency_response,object,2909,611,21.0,205,"15,25 | 6,75 | 12,28 | 10,40"
+headphones,microphone,bool,2909,0,0.0,2,True | False
+headphones,name,object,2909,0,0.0,2522,"HP HyperX Cloud II | HiFiMAN Susvara | Razer BlackShark V2 X | SteelSeries Arctis Nova Pro Wireless for PC, PS5, and PS4"
+headphones,price,float64,2909,2246,77.21,401,70.98 | 5999.0 | 39.97 | 326.99
+headphones,type,object,2909,0,0.0,4,Circumaural | Earbud | In Ear | Supra-aural
+headphones,wireless,bool,2909,0,0.0,2,False | True
+internal-hard-drive,cache,float64,5962,4170,69.94,15,2048.0 | 4096.0 | 1024.0 | 256.0
+internal-hard-drive,capacity,float64,5962,0,0.0,91,2000.0 | 1000.0 | 4000.0 | 500.0
+internal-hard-drive,form_factor,object,5962,0,0.0,9,M.2-2280 | 3.5 | 2.5 | PCIe
+internal-hard-drive,interface,object,5962,0,0.0,23,M.2 PCIe 4.0 X4 | M.2 PCIe 5.0 X2 | M.2 PCIe 5.0 X4 | SATA 6.0 Gb/s
+internal-hard-drive,name,object,5962,0,0.0,1877,Samsung 990 Pro | Crucial P3 Plus | Kingston NV3 | Samsung 990 EVO Plus
+internal-hard-drive,price,float64,5962,3867,64.86,1259,149.99 | 56.95 | 113.95 | 299.99
+internal-hard-drive,price_per_gb,float64,5962,3922,65.78,438,0.075 | 0.057 | 0.058 | 0.1
+internal-hard-drive,type,object,5962,30,0.5,13,SSD | 7200 | 5400 | 5640
+keyboard,backlit,object,3821,1590,41.61,11,RGB | Red | White | Multicolor
+keyboard,color,object,3821,23,0.6,92,Black | White | Black / Silver | Black / Green
+keyboard,connection_type,object,3821,8,0.21,11,"Wired | Wired, Wireless, Bluetooth Wireless | Wireless | Wired, Wired, Wireless, Bluetooth Wireless"
+keyboard,name,object,3821,0,0.0,2361,HP HyperX Alloy Core | Redragon K552 | RK Royal Kludge RK61 | Corsair K70 RGB PRO
+keyboard,price,float64,3821,2999,78.49,422,37.99 | 34.99 | 49.99 | 169.99
+keyboard,style,object,3821,0,0.0,6,Gaming | Mini | Ergonomic | Standard
+keyboard,switches,object,3821,1393,36.46,286,Outemu Blue | RK Red | Cherry MX Red | ROG NX Snow
+keyboard,tenkeyless,bool,3821,0,0.0,2,False | True
+memory,cas_latency,float64,12596,0,0.0,34,36.0 | 16.0 | 30.0 | 18.0
+memory,color,object,12596,632,5.02,65,Black | Black / Yellow | Black / Gray | Black / Silver
+memory,first_word_latency,float64,12596,0,0.0,180,12.0 | 10.0 | 15.385 | 9.697
+memory,modules,object,12596,0,0.0,45,"2,16 | 2,8 | 2,32 | 4,16"
+memory,name,object,12596,0,0.0,3493,Corsair Vengeance RGB 32 GB | G.Skill Flare X5 32 GB | Corsair Vengeance LPX 16 GB | Corsair Vengeance 32 GB
+memory,price,float64,12596,9712,77.1,1600,94.99 | 89.99 | 45.99 | 129.99
+memory,price_per_gb,float64,12596,9768,77.55,1489,2.968 | 2.812 | 2.874 | 4.062
+memory,speed,object,12596,0,0.0,79,"5,6000 | 4,3200 | 4,3600 | 5,6400"
+monitor,aspect_ratio,object,4967,0,0.0,16,16:9 | 32:9 | 21:9 | 64:27
+monitor,name,object,4967,0,0.0,4798,KOORUI 24E3 | Asus TUF Gaming VG27AQ | LG 65EP5G-B | MSI MAG 275QF
+monitor,panel_type,object,4967,766,15.42,14,IPS | OLED | QD-OLED | VA
+monitor,price,float64,4967,3618,72.84,697,109.99 | 249.0 | 9333.0 | 199.99
+monitor,refresh_rate,float64,4967,848,17.07,45,165.0 | 120.0 | 180.0 | 240.0
+monitor,resolution,object,4967,0,0.0,32,"1920,1080 | 2560,1440 | 3840,2160 | 7680,2160"
+monitor,response_time,float64,4967,860,17.31,34,1.0 | 0.1 | 0.5 | 0.03
+monitor,screen_size,float64,4967,0,0.0,86,24.0 | 27.0 | 65.0 | 31.5
+motherboard,color,object,4973,303,6.09,66,Black / Silver | Black | Blue / Silver | Gray / Black
+motherboard,form_factor,object,4973,0,0.0,11,ATX | Micro ATX | Mini ITX | EATX
+motherboard,max_memory,int64,4973,0,0.0,15,192 | 256 | 128 | 64
+motherboard,memory_slots,int64,4973,0,0.0,7,4 | 2 | 8 | 16
+motherboard,name,object,4973,0,0.0,4957,Asus PRIME B650-PLUS WIFI | MSI B650 GAMING PLUS WIFI | MSI MAG B650 TOMAHAWK WIFI | Gigabyte X870E AORUS ELITE WIFI7
+motherboard,price,float64,4973,4022,80.88,629,159.99 | 169.99 | 189.42 | 325.31
+motherboard,socket,object,4973,0,0.0,62,AM5 | AM4 | LGA1700 | sTRX4
+mouse,color,object,2766,6,0.22,100,Black | White | Black / Silver | Black / Green
+mouse,connection_type,object,2766,6,0.22,10,"Wired, Wireless | Wired | Wireless | Wired, Wired, Wireless"
+mouse,hand_orientation,object,2766,129,4.66,3,Right | Both | Left
+mouse,max_dpi,float64,2766,601,21.73,71,12000.0 | 25600.0 | 32000.0 | 26000.0
+mouse,name,object,2766,0,0.0,2121,Logitech G305 LIGHTSPEED | Logitech G502 Hero | Logitech PRO X Superlight 2 | Razer Basilisk V3
+mouse,price,float64,2766,1921,69.45,440,29.99 | 44.77 | 164.74 | 39.98
+mouse,tracking_method,object,2766,0,0.0,4,Optical | Laser | Trackball | Touchpad
+optical-drive,bd,float64,231,156,67.53,6,12.0 | 6.0 | 8.0 | 10.0
+optical-drive,bd_write,object,231,174,75.32,25,14/12/2/2 | 16/12/2/2 | 16/14/2/2 | 6/6/2/6
+optical-drive,cd,float64,231,26,11.26,5,48.0 | 40.0 | 24.0 | 50.0
+optical-drive,cd_write,object,231,29,12.55,16,48/24 | 48/32 | 40/24 | 48/40
+optical-drive,dvd,float64,231,27,11.69,7,16.0 | 8.0 | 22.0 | 12.0
+optical-drive,dvd_write,object,231,27,11.69,61,16/8/8/16/6/8/5 | 24/8/8/24/6/8/5 | 24/8/12/24/6/12/12 | 16/13/12/16/8/12/5
+optical-drive,name,object,231,0,0.0,231,LG WH14NS40 | Lite-On iHAS124-14 | Asus BW-16D1HT | LG WH16NS40
+optical-drive,price,float64,231,203,87.88,26,99.99 | 28.89 | 128.99 | 123.0
+os,max_memory,int64,51,0,0.0,6,128 | 2048 | 16 | 4
+os,mode,object,51,0,0.0,3,"64 | 32,64 | 32"
+os,name,object,51,0,0.0,50,Microsoft Windows 11 Home OEM - DVD 64-bit | Microsoft Windows 11 Pro OEM - DVD 64-bit | Microsoft Windows 11 Home Retail - USB 64-bit | Microsoft Windows 11 Pro Retail - Download 64-bit
+os,price,float64,51,39,76.47,12,109.99 | 146.18 | 134.99 | 189.99
+power-supply,color,object,3371,1515,44.94,29,Black | Silver / Black | White | White / Black
+power-supply,efficiency,object,3371,400,11.87,6,gold | bronze | platinum | plus
+power-supply,modular,object,3371,0,0.0,4,Full | false | Semi | Full / Side
+power-supply,name,object,3371,0,0.0,2130,MSI MAG A750GL PCIE5 | MSI MAG A850GL PCIE5 | MSI MAG A650BN | Corsair RM1000e (2023)
+power-supply,price,float64,3371,2805,83.21,382,109.99 | 121.99 | 74.98 | 179.99
+power-supply,type,object,3371,0,0.0,5,ATX | SFX | Flex ATX | TFX
+power-supply,wattage,int64,3371,0,0.0,83,750 | 850 | 650 | 1000
+sound-card,channels,float64,76,0,0.0,4,5.1 | 7.1 | 2.0 | 4.0
+sound-card,chipset,object,76,33,43.42,15,Sound Core3D | Creative E-MU | ASUS AV100 | X-Fi
+sound-card,digital_audio,float64,76,6,7.89,3,32.0 | 24.0 | 16.0
+sound-card,interface,object,76,0,0.0,2,PCIe x1 | PCI
+sound-card,name,object,76,0,0.0,75,Creative Labs Sound BlasterX AE-5 Plus | Creative Labs Sound Blaster AE-9 | Creative Labs Sound Blaster Audigy Rx | Asus Xonar SE
+sound-card,price,float64,76,64,84.21,12,161.49 | 427.49 | 66.48 | 81.26
+sound-card,sample_rate,float64,76,6,7.89,5,384.0 | 192.0 | 96.0 | 48.0
+sound-card,snr,float64,76,23,30.26,20,122.0 | 129.0 | 106.0 | 120.0
+speakers,color,object,302,150,49.67,24,Black | White / Black | White | Black / Copper
+speakers,configuration,float64,302,0,0.0,4,2.0 | 5.1 | 2.1 | 1.0
+speakers,frequency_response,object,302,26,8.61,77,"100,17 | 35,20 | 50,20 | 85,20"
+speakers,name,object,302,0,0.0,281,Creative Labs Pebble 2.0 | SteelSeries Arena 9 EU | Kanto TUK | Logitech Z207 (Black)
+speakers,price,float64,302,178,58.94,75,29.0 | 877.06 | 899.99 | 29.73
+speakers,wattage,float64,302,38,12.58,85,4.4 | 260.0 | 0.01 | 65.0
+thermal-paste,amount,float64,207,0,0.0,41,3.5 | 1.0 | 4.0 | 2.0
+thermal-paste,name,object,207,0,0.0,132,Arctic Silver 5 High-Density Polysynthetic Silver | Thermal Grizzly Kryonaut | ARCTIC MX-6 | Noctua NT-H2
+thermal-paste,price,float64,207,105,50.72,78,7.95 | 7.75 | 7.99 | 14.95
+ups,capacity_va,float64,701,3,0.43,57,1500.0 | 20000.0 | 10000.0 | 3000.0
+ups,capacity_w,float64,701,3,0.43,110,1000.0 | 16000.0 | 900.0 | 10000.0
+ups,name,object,701,0,0.0,693,CyberPower CP1500PFCLCD | APC SURT20KRMXLT | APC Back-UPS 1500 | CyberPower CP1500AVRLCD
+ups,price,float64,701,399,56.92,274,239.95 | 24100.0 | 189.99 | 199.95
+video-card,boost_clock,float64,6563,2468,37.6,423,1777.0 | 3290.0 | 2497.0 | 2542.0
+video-card,chipset,object,6563,0,0.0,374,GeForce RTX 3060 12GB | Radeon RX 9060 XT | GeForce RTX 5070 Ti | GeForce RTX 5070
+video-card,color,object,6563,300,4.57,75,Black | Black / Silver | Black / Gray | Black / White
+video-card,core_clock,float64,6563,124,1.89,440,1320.0 | 2220.0 | 2300.0 | 2160.0
+video-card,length,float64,6563,660,10.06,221,235.0 | 240.0 | 303.0 | 282.0
+video-card,memory,float64,6563,0,0.0,24,12.0 | 16.0 | 32.0 | 8.0
+video-card,name,object,6563,0,0.0,3555,MSI GeForce RTX 3060 Ventus 2X 12G | Sapphire PULSE | MSI SHADOW 3X OC | Gigabyte WINDFORCE OC SFF
+video-card,price,float64,6563,5290,80.6,796,299.97 | 379.99 | 829.99 | 549.99
+webcam,connection,object,74,0,0.0,4,USB 3.2 Gen 1 Type-A | USB 3.2 Gen 1 Type-C | USB 2.0 Type-A | USB 2.0 Type-C
+webcam,focus_type,object,74,5,6.76,3,Auto | Fixed | Manual
+webcam,fov,float64,74,13,17.57,25,82.0 | 90.0 | 95.0 | 78.0
+webcam,name,object,74,0,0.0,71,Razer Kiyo Pro Ultra | Logitech BRIO Ultra HD Pro | Elgato Facecam Pro | Anker PowerConf C200
+webcam,os,object,74,0,0.0,9,"Windows | Windows,OS X,ChromeOS | Windows,OS X | Windows,OS X,ChromeOS,Android"
+webcam,price,float64,74,19,25.68,45,299.99 | 132.99 | 47.99 | 264.58
+webcam,resolutions,object,74,0,0.0,12,"4k,2k,1080p,720p | 4k,1080p,720p | 2k,1080p,720p | 1080p,720p"
+wired-network-card,color,object,157,99,63.06,18,Black / Silver | Black / Gold | Red | Green / Black
+wired-network-card,interface,object,157,0,0.0,11,PCIe x1 | PCIe x4 | PCIe x8 | USB Type-A 3.2 Gen 1
+wired-network-card,name,object,157,0,0.0,157,TP-Link TG-3468 | StarTech ST10GPEXNDPI | Asus XG-C100C | Intel X540-T2
+wired-network-card,price,float64,157,73,46.5,79,14.99 | 452.97 | 99.99 | 87.0
+wireless-network-card,color,object,369,267,72.36,16,Black / Silver | Black | Red / Black | Green
+wireless-network-card,interface,object,369,0,0.0,9,PCIe x1 | USB Type-A 2.0 | M.2 PCIe | USB Type-A 3.2 Gen 1
+wireless-network-card,name,object,369,0,0.0,360,Gigabyte GC-WBAX210 | TP-Link Archer TBE550E | TP-Link Archer TX3000E | TP-Link ARCHER T2U PLUS
+wireless-network-card,price,float64,369,232,62.87,104,36.99 | 79.98 | 31.99 | 14.85
+wireless-network-card,protocol,object,369,0,0.0,7,Wi-Fi 6E | Wi-Fi 7 | Wi-Fi 6 | Wi-Fi 5

@@ -346,6 +346,25 @@ def load_data(csv_dir):
     return d
 
 
+def load_processed_data(processed_dir):
+    """Load the already-cleaned engine DataFrames exported by the preprocessing notebook.
+
+    Files are stored under data/processed/engine using internal component keys.
+    This keeps Streamlit startup free of raw-data cleaning work.
+    """
+    from pathlib import Path
+    folder = Path(processed_dir)
+    keys = ["cpu", "gpu", "mobo", "ram", "ssd", "psu", "case",
+            "cooler", "monitor", "keyboard", "mouse"]
+    missing = [key for key in keys if not (folder / f"{key}.csv").is_file()]
+    if missing:
+        raise FileNotFoundError(
+            f"Missing preprocessed component files in {folder}: {', '.join(missing)}. "
+            "Run the preprocessing notebook and upload its generated project files."
+        )
+    return {key: pd.read_csv(folder / f"{key}.csv") for key in keys}
+
+
 def cleaning_report(csv_dir, data):
     """Rows before/after cleaning for the report."""
     files = dict(cpu="cpu", gpu="video-card", mobo="motherboard",

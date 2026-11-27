@@ -1,0 +1,12 @@
+category,raw_rows,missing_price_pct,usable_rows
+cpu,1413,61.3,170
+gpu,6636,80.8,83
+mobo,4973,80.9,686
+ram,13553,78.6,269
+ssd,6461,67.5,296
+psu,3438,83.5,243
+case,6626,84.1,614
+cooler,2851,66.8,621
+monitor,5074,73.1,1133
+keyboard,4310,80.9,554
+mouse,2806,69.9,602

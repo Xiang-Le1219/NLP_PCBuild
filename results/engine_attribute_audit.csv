@@ -1,0 +1,99 @@
+component,source_field,display_label,engine_column,value_type,available_after_cleaning,missing_pct,unique_values
+cpu,name,CPU model/name,name,text,True,0.0,170
+cpu,price,CPU maximum price (USD dataset price),price,number,True,0.0,159
+cpu,core_count,CPU core count,cores,number,True,0.0,10
+cpu,core_clock,CPU base clock (GHz),core_clock,number,True,0.0,25
+cpu,boost_clock,CPU boost clock (GHz),boost_clock,number,True,6.47,26
+cpu,microarchitecture,CPU microarchitecture,microarchitecture,choice,True,0.0,12
+cpu,tdp,CPU TDP (W),tdp,number,True,0.0,11
+cpu,graphics,Integrated graphics model,graphics,choice,True,45.29,15
+cpu,socket,CPU socket (derived),socket,choice,True,0.0,5
+cpu,brand,CPU brand (derived),brand,choice,True,0.0,2
+cpu,has_igpu,Integrated graphics available (derived),has_igpu,bool,True,0.0,2
+gpu,name,GPU model/name,name,text,True,0.0,83
+gpu,price,GPU maximum price (USD dataset price),price,number,True,0.0,75
+gpu,chipset,GPU chipset,chipset,choice,True,0.0,76
+gpu,memory,GPU VRAM (GB),memory,number,True,0.0,10
+gpu,core_clock,GPU core clock (MHz),core_clock,number,True,0.0,61
+gpu,boost_clock,GPU boost clock (MHz),boost_clock,number,True,12.05,57
+gpu,color,GPU colour,color,choice,True,2.41,14
+gpu,length,GPU length (mm),length,number,True,0.0,57
+gpu,brand,GPU brand (derived),brand,choice,True,0.0,3
+mobo,name,Motherboard model/name,name,text,True,0.0,686
+mobo,price,Motherboard maximum price (USD dataset price),price,number,True,0.0,435
+mobo,socket,Motherboard CPU socket,socket,choice,True,0.0,5
+mobo,form_factor,Motherboard form factor,form_factor,choice,True,0.0,3
+mobo,max_memory,Motherboard maximum memory (GB),max_memory,number,True,0.0,6
+mobo,memory_slots,Motherboard memory slots,memory_slots,number,True,0.0,2
+mobo,color,Motherboard colour,color,choice,True,0.44,32
+mobo,chipset_code,Motherboard chipset (derived),chipset_code,choice,True,0.0,27
+mobo,ddr,Supported DDR generation (derived),ddr,number,True,0.0,2
+ram,name,RAM model/name,name,text,True,0.0,269
+ram,price,RAM maximum price (USD dataset price),price,number,True,0.0,192
+ram,speed,RAM speed field,speed,text,True,0.0,17
+ram,modules,RAM module configuration,modules,text,True,0.0,8
+ram,price_per_gb,RAM price per GB,price_per_gb,number,True,2.6,173
+ram,color,RAM colour,color,choice,True,1.12,24
+ram,first_word_latency,RAM first-word latency,first_word_latency,number,True,0.0,33
+ram,cas_latency,RAM CAS latency,cas_latency,number,True,0.0,16
+ram,ddr,RAM DDR generation (derived),ddr,number,True,0.0,2
+ram,mhz,"RAM speed (MT/s, derived)",mhz,number,True,0.0,17
+ram,n_mod,RAM number of modules (derived),n_mod,number,True,0.0,2
+ram,gb_each,RAM GB per module (derived),gb_each,number,True,0.0,7
+ram,total_gb,RAM total capacity (derived),total_gb,number,True,0.0,8
+ssd,name,Storage model/name,name,text,True,0.0,296
+ssd,price,Storage maximum price (USD dataset price),price,number,True,0.0,206
+ssd,capacity,Storage capacity (GB),capacity,number,True,0.0,10
+ssd,price_per_gb,Storage price per GB,price_per_gb,number,True,3.72,129
+ssd,type,Storage type,type,choice,True,0.0,1
+ssd,cache,Storage cache (MB),cache,number,True,91.22,4
+ssd,form_factor,Storage form factor,form_factor,choice,True,0.0,1
+ssd,interface,Storage interface,interface,choice,True,0.0,5
+psu,name,PSU model/name,name,text,True,0.0,243
+psu,price,PSU maximum price (USD dataset price),price,number,True,0.0,191
+psu,type,PSU form/type,type,choice,True,0.0,1
+psu,efficiency,PSU efficiency rating,efficiency,choice,True,0.0,5
+psu,wattage,PSU wattage (W),wattage,number,True,0.0,23
+psu,modular,PSU modularity,modular,choice,True,0.0,4
+psu,color,PSU colour,color,choice,True,20.16,16
+psu,watt,PSU wattage (derived),watt,number,True,0.0,23
+psu,eff,PSU efficiency rank (derived),eff,number,True,0.0,5
+case,name,PC case model/name,name,text,True,0.0,614
+case,price,Case maximum price (USD dataset price),price,number,True,0.0,381
+case,type,Case type/form factor,type,choice,True,0.0,5
+case,color,Case colour,color,choice,True,1.47,35
+case,psu,Included PSU wattage,psu,number,True,98.53,5
+case,side_panel,Case side panel,side_panel,choice,True,13.84,5
+case,external_volume,Case external volume,external_volume,number,True,11.4,301
+case,internal_35_bays,Internal 3.5-inch bays,internal_35_bays,number,True,0.0,14
+cooler,name,CPU cooler model/name,name,text,True,0.0,621
+cooler,price,Cooler maximum price (USD dataset price),price,number,True,0.0,422
+cooler,rpm,Cooler fan RPM source range,rpm,text,True,5.15,145
+cooler,rpm_max,Cooler maximum fan RPM (derived),rpm_max,number,True,5.15,39
+cooler,noise_level,Cooler noise source range,noise_level,text,True,0.0,262
+cooler,noise_max,Cooler maximum noise level (derived),noise_max,number,True,0.0,162
+cooler,color,Cooler colour,color,choice,True,14.33,33
+cooler,size,Cooler radiator size (mm),size,number,True,53.14,6
+monitor,name,Monitor model/name,name,text,True,0.0,1133
+monitor,price,Monitor maximum price (USD dataset price),price,number,True,0.0,594
+monitor,screen_size,Monitor screen size (inches),screen_size,number,True,0.0,28
+monitor,resolution,Monitor resolution,resolution,choice,True,0.0,13
+monitor,refresh_rate,Monitor refresh rate (Hz),refresh_rate,number,True,0.0,32
+monitor,response_time,Monitor response time (ms),response_time,number,True,23.65,22
+monitor,panel_type,Monitor panel type,panel_type,choice,True,1.85,12
+monitor,aspect_ratio,Monitor aspect ratio,aspect_ratio,choice,True,0.0,7
+keyboard,name,Keyboard model/name,name,text,True,0.0,554
+keyboard,price,Keyboard maximum price (USD dataset price),price,number,True,0.0,336
+keyboard,style,Keyboard style,style,choice,True,0.0,6
+keyboard,switches,Keyboard switch type,switches,choice,True,57.4,111
+keyboard,backlit,Keyboard backlight,backlit,choice,True,53.25,7
+keyboard,tenkeyless,Tenkeyless (TKL),tenkeyless,bool,True,0.0,2
+keyboard,connection_type,Keyboard connection,connection_type,choice,True,0.72,10
+keyboard,color,Keyboard colour,color,choice,True,1.08,34
+mouse,name,Mouse model/name,name,text,True,0.0,602
+mouse,price,Mouse maximum price (USD dataset price),price,number,True,0.0,359
+mouse,tracking_method,Mouse tracking method,tracking_method,choice,True,0.0,4
+mouse,connection_type,Mouse connection,connection_type,choice,True,0.17,8
+mouse,max_dpi,Mouse maximum DPI,max_dpi,number,True,20.27,52
+mouse,hand_orientation,Mouse hand orientation,hand_orientation,choice,True,3.65,3
+mouse,color,Mouse colour,color,choice,True,0.33,59
