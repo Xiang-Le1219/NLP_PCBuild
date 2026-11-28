@@ -1,0 +1,27 @@
+{
+  "project": "NLP_PCBuild",
+  "scope": "RAM/SSD natural-language extraction, Review form hand-off, recommendation selection and result export",
+  "changes": [
+    "RAM parsing now prioritizes 1-4 x N GB module totals, explicit label connectors, and value-before-label wording.",
+    "Storage parsing supports SSD/NVMe/storage/hard-drive labels, GB/TB, and natural-language connectors such as is/should be/at least.",
+    "Chinese 内存 and 固态硬盘 labels are supported.",
+    "VRAM-only mentions do not populate system RAM.",
+    "Explicit message values are the source of truth in baseline and both OPT modes; raw model predictions remain saved separately.",
+    "Review form values are used to rebuild min-capacity filters and cannot be overridden by stale extraction preferences.",
+    "Completed analysis records include raw output, model-only prediction, rule-verified values, reviewed RAM/SSD, and resulting build; JSON and CSV downloads added."
+  ],
+  "tests": {
+    "parser_and_field_report_cases": 19,
+    "end_to_end_recommendation_cases": 4,
+    "manual_review_override": "passed",
+    "both_opt_mode_rule_override_simulations": "passed in smoke_test.py",
+    "existing_smoke_test": "passed (10 original + 9 additional parser/review + 4 build cases)",
+    "budget_strategy_scenarios": 28,
+    "python_compile": "passed"
+  },
+  "limitations": [
+    "Actual pretrained/fine-tuned Hugging Face inference was not executed in this environment because transformers/peft and Streamlit are not installed and base checkpoint download was not performed.",
+    "Streamlit UI runtime was syntax-checked but not launched in this environment.",
+    "Session history is downloadable but not persistent between Streamlit Cloud sessions; the user must download it."
+  ]
+}

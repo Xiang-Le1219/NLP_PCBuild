@@ -1,0 +1,5 @@
+input,required_ram_gb,selected_ram_gb,required_storage_gb,selected_storage_gb,total_myr,budget_myr,compatibility_violations,passed
+Office PC RM1500 8GB RAM 256GB SSD,8,8.0,256,256.0,1496.271,1500.0,0,True
+"Gaming PC RM4500, SSD 512GB, RAM: 32GB",32,32.0,512,512.0,4499.218999999999,4500.0,0,True
+Gaming PC RM6000 with 2 x 16GB RAM and 1TB SSD,32,32.0,1000,1000.0,5999.145,6000.0,0,True
+"Office PC RM3500, 32GB 内存，1TB 固态硬盘",32,32.0,1000,1000.0,3499.985,3500.0,0,True

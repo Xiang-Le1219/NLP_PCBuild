@@ -1,0 +1,20 @@
+input,expected_ram_gb,extracted_ram_gb,expected_storage_gb,extracted_storage_gb,field_report_user_stated,passed
+Need gaming PC with 16GB RAM and 512GB SSD,16.0,16.0,512.0,512.0,True,True
+Office PC RM1500 8GB RAM 256GB SSD,8.0,8.0,256.0,256.0,True,True
+RAM 32GB SSD 1TB,32.0,32.0,1000.0,1000.0,True,True
+RAM: 32GB; SSD: 512GB,32.0,32.0,512.0,512.0,True,True
+"SSD 512GB, RAM: 32GB",32.0,32.0,512.0,512.0,True,True
+RAM is 32GB and SSD is 1TB,32.0,32.0,1000.0,1000.0,True,True
+RAM should be 32GB and storage should be 2TB,32.0,32.0,2000.0,2000.0,True,True
+at least 32GB RAM and at least 2TB storage,32.0,32.0,2000.0,2000.0,True,True
+I have 16 GB of RAM and 512 GB of storage,16.0,16.0,512.0,512.0,True,True
+Need 2x16GB RAM and 1TB NVMe SSD,32.0,32.0,1000.0,1000.0,True,True
+Need 2 x 16 GB RAM and 1 TB SSD,32.0,32.0,1000.0,1000.0,True,True
+"RAM 2x16GB, SSD 1TB",32.0,32.0,1000.0,1000.0,True,True
+GPU has 16GB VRAM; system RAM 32GB; SSD 1TB,32.0,32.0,1000.0,1000.0,True,True
+"RTX 4070 12GB, 32GB RAM, 1TB NVMe",32.0,32.0,1000.0,1000.0,True,True
+32 gigs memory and one terabyte SSD,32.0,32.0,1000.0,1000.0,True,True
+"DDR5 6000 32GB RAM, SSD capacity 1TB",32.0,32.0,1000.0,1000.0,True,True
+32GB 内存，1TB 固态硬盘,32.0,32.0,1000.0,1000.0,True,True
+RTX 4070 has 16GB VRAM,,,,,True,True
+"Gaming PC with 12GB GPU memory, no RAM or SSD specified",,,,,True,True
