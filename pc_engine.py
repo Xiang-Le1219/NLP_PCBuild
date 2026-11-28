@@ -502,9 +502,10 @@ class BuildEngine:
         if key not in self._ram_cache:
             r = self.d["ram"]
             r = self._apply_preferences(r, "ram", req) if req is not None else r
-            r = r[(r["ddr"] == ddr) & (r["total_gb"] == gb)]
+            # A request of 24GB is a MINIMUM. A compatible 32GB kit qualifies.
+            r = r[(r["ddr"] == ddr) & (r["total_gb"] >= gb)]
             self._ram_cache[key] = None if len(r) == 0 else \
-                r.sort_values("price").iloc[0]
+                r.sort_values(["price", "total_gb"]).iloc[0]
         return self._ram_cache[key]
 
     def _platform(self, cpu, req, ram_gb, min_tier):
@@ -546,7 +547,9 @@ class BuildEngine:
     def _ssd(self, gb, req=None):
         s = self.d["ssd"]
         s = self._apply_preferences(s, "ssd", req) if req is not None else s
-        s = s[(s["capacity"] >= gb) & (s["capacity"] <= gb * 2.1)]
+        # Storage requests are minimums, not exact-size restrictions. A 500GB
+        # drive can meet a 256GB request and 1TB can meet an 800GB request.
+        s = s[s["capacity"] >= gb]
         return None if len(s) == 0 else s.sort_values("price").iloc[0]
 
     def _psu(self, watts, min_eff, req=None):
@@ -679,12 +682,36 @@ class BuildEngine:
                                           ram_gb, ssd, search_budget,
                                           req.budget_strategy)
 
+        integrated_fallback = False
+        # Closest-to-budget mode normally considers a discrete GPU; cheap
+        # office/general/programming builds still need an iGPU-only fallback.
+        # For tight gaming budgets, give an explicitly labelled basic iGPU
+        # alternative rather than claiming no compatible PC exists.
+        if (best is None and req.gpu_brand == "any"
+                and not (req.component_preferences or {}).get("gpu")):
+            igpu_cpus = cpus[cpus["has_igpu"].astype(str).str.lower().isin(["true", "1"])]
+            if len(igpu_cpus):
+                alternate, alt_cheapest = self._search(
+                    igpu_cpus, [None], req, prof, cpu_key,
+                    ram_gb, ssd, search_budget, req.budget_strategy
+                )
+                if alt_cheapest is not None and (cheapest is None or alt_cheapest[-2] < cheapest[-2]):
+                    cheapest = alt_cheapest
+                if alternate is not None:
+                    best = alternate
+                    integrated_fallback = True
+
         if best is None:
             mn = None if cheapest is None else (cheapest[-2] + extras_cost) * USD_TO_MYR
-            return dict(ok=False, requirement=req, min_cost_myr=mn,
-                        message=("Budget is too low for a compatible build"
-                                 + ("" if mn is None else
-                                    f"; the cheapest build in the dataset is about RM {mn:,.0f}.")))
+            if mn is None:
+                message = ("No build satisfies the specified hardware constraints "
+                           "in this catalogue. Try relaxing CPU/GPU model, RAM speed, "
+                           "case or colour filters. Budget may not be the cause.")
+            else:
+                message = ("No compatible build found within the selected budget "
+                           f"and requirements. Cheapest candidate: RM {mn:,.2f} "
+                           "(dataset prices). Try raising the budget or reducing constraints.")
+            return dict(ok=False, requirement=req, min_cost_myr=mn, message=message)
 
         _, _, cpu, gpu, board, ram, case, cooler, psu, total, watts = best
         parts = dict(cpu=cpu, mobo=board, ram=ram, ssd=ssd, case=case, psu=psu)
@@ -698,7 +725,12 @@ class BuildEngine:
         left = core_budget - total
         parts, left, upgrades = self._upgrade(parts, left, req, ram_gb, ssd_gb, watts)
 
-        return self._pack(req, parts, watts, left, upgrades)
+        result = self._pack(req, parts, watts, left, upgrades)
+        if integrated_fallback:
+            result["warnings"].insert(0,
+                "Used CPU integrated graphics to meet the budget; this is not "
+                "a substitute for a gaming GPU and may have limited game performance.")
+        return result
 
     def _search(self, cpus, gpu_options, req, prof, cpu_key, ram_gb, ssd,
                 core_budget, budget_strategy="best_value"):

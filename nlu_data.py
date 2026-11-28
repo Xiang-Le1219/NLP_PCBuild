@@ -275,6 +275,16 @@ EXTRACT_HEAD = ("Extract the PC requirements from the customer message as JSON.\
 def extract_prompt(text):
     return f"{EXTRACT_HEAD}Message: {text}\nJSON:"
 
+# The bundled LoRA adapter was trained on this shorter instruction in the
+# previously supplied OPT-125M notebook. Preserve it for true adapter inference.
+EXTRACT_HEAD_TRAINING = ("Extract the PC requirements from the customer message as JSON.\n"
+                         "Keys: use_case, budget, currency, cpu_brand, gpu_brand, ram_gb, "
+                         "storage_gb, extras, compact.\n")
+
+
+def extract_prompt_training(text):
+    return f"{EXTRACT_HEAD_TRAINING}Message: {text}\nJSON:"
+
 
 def few_shot_prompt(text, shots):
     body = "".join(f"Message: {t}\nJSON: {to_json(l)}\n\n" for t, l in shots)
@@ -369,6 +379,56 @@ def has_budget_mention(text):
     return any(re.search(pattern, text, flags=re.I) for pattern in patterns)
 
 
+def extract_memory_storage(text):
+    """Parse explicit RAM/SSD amounts without transferring neighbouring numbers.
+
+    Return (ram_gb, storage_gb). GB/TB prefixes are attached to the
+    named component, not arbitrary numbers in the surrounding sentence.
+    Examples: '16GB RAM 1TB SSD', 'RAM: 32gb', 'SSD 1 TB', '2x16 GB RAM'.
+    """
+    t = str(text).lower()
+    # Prefer amount-before-component for RAM, e.g. '8GB RAM 256GB SSD'.
+    ram_patterns = [
+        r"\b(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\s*(?:of\s+)?(?:ddr[45](?:[- ]?\d{4,5})?\s*)?(?:ram|system\s+memory|memory|memori)\b",
+        r"\b(?:ram|system\s+memory|memori|memory)\s*(?:capacity|size|of|minimum|min|at least|:|=|-)?\s*(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\b",
+        r"\b[12]\s*[x×]\s*(\d{1,3})\s*gb\s*(?:ram|memory)?\b",
+        r"\b(\d{1,3})\s*gb\s*ddr[45]\s*(?:ram|memory)?\b",
+    ]
+    ram = None
+    explicit_ram = re.search(
+        r"\b(?:ram|system\s+memory|memori|memory)\s*[:=]\s*"
+        r"(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\b", t
+    )
+    if explicit_ram:
+        ram = int(explicit_ram.group(1))
+    for pat in ram_patterns if ram is None else []:
+        m = re.search(pat, t, flags=re.I)
+        if m:
+            ram = int(m.group(1))
+            if 'x' in m.group(0) or '×' in m.group(0):
+                count = re.match(r'\s*([12])', m.group(0))
+                ram *= int(count.group(1)) if count else 1
+            break
+
+    storage = None
+    # A format such as "RAM: 32GB SSD: 512GB" contains a misleading
+    # "32GB SSD" substring. Prefer a numeric value *following* the explicit
+    # SSD label. If it is absent, allow "512GB SSD".
+    storage_after = (
+        r"\b(?:ssd|nvme|storage|solid\s*state\s*drive|hard\s*drive|hard\s*disk)"
+        r"\s*(?:capacity|size|of|at least|minimum|min|:|=|-)?\s*"
+        r"(\d+(?:\.\d+)?)\s*(tb|gb)\b"
+    )
+    storage_before = (
+        r"\b(\d+(?:\.\d+)?)\s*(tb|gb)\s*(?:of\s+)?"
+        r"(?:ssd|nvme|storage|solid\s*state\s*drive|hard\s*drive|hard\s*disk)\b"
+    )
+    match = re.search(storage_after, t) or re.search(storage_before, t)
+    if match:
+        storage = int(round(float(match.group(1)) * (1000 if match.group(2) == 'tb' else 1)))
+    return ram, storage
+
+
 def rule_extract(text):
     """Keyword / regex baseline (no learning)."""
     t = text.lower()
@@ -396,14 +456,7 @@ def rule_extract(text):
             out["gpu_brand"] = "amd"
         elif re.search(r"arc", t):
             out["gpu_brand"] = "intel"
-    m = re.search(r"(\d+)\s?(?:gb|g)\s?(?:of )?(?:ram|memory)|ram\s?(\d+)\s?gb?|(\d+)\s?gig", t)
-    if m:
-        out["ram_gb"] = int([g for g in m.groups() if g][0])
-    m = re.search(r"(\d+(?:\.\d+)?)\s?(tb|gb)\s?(?:ssd|storage|nvme)|(?:ssd|storage)\s?(\d+(?:\.\d+)?)\s?(tb|gb)", t)
-    if m:
-        g = [x for x in m.groups() if x]
-        v = float(g[0]) * (1000 if g[1] == "tb" else 1)
-        out["storage_gb"] = int(v)
+    out["ram_gb"], out["storage_gb"] = extract_memory_storage(t)
     for e, pat in (("monitor", r"monitor|display"), ("keyboard", r"keyboard|papan kekunci"),
                    ("mouse", r"mouse|tetikus")):
         if re.search(pat, t):

@@ -9,7 +9,7 @@ ROOT = Path(__file__).resolve().parent
 MODEL = "facebook/opt-125m"
 DEFAULT_BUDGET_MYR = 4000
 BASELINE = "Rule-based baseline"
-PRETRAINED = "Pretrained OPT-125M"
+PRETRAINED = "Pretrained OPT-125M (few-shot)"
 FINETUNED = "Fine-tuned OPT-125M (LoRA)"
 
 
@@ -60,6 +60,17 @@ def rule_requirements(text, data=None):
     corrected, typo_changes = C.correct_typos(text)
     rules, corrected = _explicit_core_fields(corrected)
     preferences, corrected, _ = C.extract_component_preferences(corrected, data or {})
+    # The generic catalogue patterns can accidentally treat the SSD number
+    # following 'RAM' as RAM (e.g. '8GB RAM 256GB SSD'). Explicitly parsed
+    # core capacities are authoritative; remove false numeric constraints.
+    if "ram" in preferences:
+        preferences["ram"].pop("total_gb", None)
+    if "ssd" in preferences:
+        preferences["ssd"].pop("capacity", None)
+    if rules.get("ram_gb"):
+        preferences.setdefault("ram", {})["total_gb"] = {"min": rules["ram_gb"]}
+    if rules.get("storage_gb"):
+        preferences.setdefault("ssd", {})["capacity"] = {"min": rules["storage_gb"]}
     rules["component_preferences"] = preferences
     rules["typo_corrections"] = typo_changes
     rules["corrected_text"] = corrected
@@ -75,6 +86,7 @@ class ModelSession:
         self.O = O
         self.mode = mode
         self.lock = threading.RLock()
+        self.shots = None
         torch.set_num_threads(min(2, torch.get_num_threads()))
         if mode == FINETUNED:
             if not adapter_ready("extract"):
@@ -84,6 +96,15 @@ class ModelSession:
             )
         elif mode == PRETRAINED:
             self.tok, self.model = O.load_opt(MODEL)
+            # The base OPT checkpoint is not instruction tuned; a few genuine
+            # labelled training examples provide the expected JSON format.
+            import json
+            training_file = ROOT / "data" / "nlu" / "train.jsonl"
+            if training_file.is_file():
+                with training_file.open(encoding="utf-8") as f:
+                    examples = [(row["text"], row["label"])
+                                for line in f if (row := json.loads(line))]
+                self.shots = O.pick_shots(examples, k=4, seed=42)
         else:
             raise ValueError("Unknown OPT mode")
 
@@ -92,7 +113,9 @@ class ModelSession:
         rules = rule_requirements(corrected, data)
         with self.lock:
             preds, _, raw = self.O.run_extraction(
-                self.model, self.tok, [corrected], shots=None, batch_size=1
+                self.model, self.tok, [corrected], shots=self.shots, batch_size=1,
+                prompt_builder=(N.extract_prompt_training
+                                if self.mode == FINETUNED else None)
             )
 
         model_prediction = N.normalise(preds[0]) if preds and preds[0] else {}
@@ -119,6 +142,7 @@ class ModelSession:
             else:
                 req["use_case"] = "general"
 
+        req["model_prediction"] = model_prediction if preds and preds[0] is not None else None
         has_json = bool(preds and preds[0] is not None)
         source = self.mode if has_json else self.mode + " + rule fallback"
         if not has_json:
@@ -148,7 +172,20 @@ def recommend(engine, req):
     """Preserve extracted catalogue preferences while normalising core NLU fields."""
     original = dict(req or {})
     norm = N.normalise(original)
-    norm["component_preferences"] = original.get("component_preferences") or {}
+    norm["component_preferences"] = {
+        key: dict(value) for key, value in
+        (original.get("component_preferences") or {}).items()
+    }
+    # Review-form values take priority over the initial NLP extraction.
+    for comp, col, key in (("ram", "total_gb", "ram_gb"),
+                           ("ssd", "capacity", "storage_gb")):
+        norm["component_preferences"].setdefault(comp, {}).pop(col, None)
+        if norm.get(key):
+            norm["component_preferences"][comp][col] = {"min": norm[key]}
+    for comp, key in (("cpu", "cpu_brand"), ("gpu", "gpu_brand")):
+        norm["component_preferences"].setdefault(comp, {}).pop("brand", None)
+        if norm.get(key) in {"amd", "intel", "nvidia"}:
+            norm["component_preferences"][comp]["brand"] = {"eq": norm[key]}
     norm["budget_strategy"] = original.get("budget_strategy", "closest_to_budget")
     norm["budget_is_default"] = bool(original.get("budget_is_default", False))
     if original.get("budget") is not None:

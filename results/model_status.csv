@@ -1,4 +1,4 @@
-model,status
-Rule-based baseline,Evaluated
-Pretrained OPT-125M,Evaluated
-Fine-tuned OPT-125M,Not evaluated
+model,status,evidence
+Rule-based baseline,Evaluated,results/model_comparison.csv
+Pretrained OPT-125M,Evaluated zero-shot in this project and few-shot in earlier training run,results/model_comparison.csv + results/opt125m_evaluation.csv
+Fine-tuned OPT-125M LoRA,Previously trained and evaluated; adapter included,adapters/extract_125m/ + results/opt125m_evaluation.csv

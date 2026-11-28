@@ -8,6 +8,8 @@ from __future__ import annotations
 
 import logging
 import time
+import json
+from datetime import datetime, timezone
 import pandas as pd
 import streamlit as st
 
@@ -54,6 +56,12 @@ with st.sidebar:
             "These choices affect requirement extraction only. Component filtering, "
             "compatibility checks and build ranking are performed by the same PC engine."
         )
+    if A.adapter_ready("extract"):
+        st.success("Fine-tuned OPT-125M adapter found (weights included).")
+    else:
+        st.warning("No fine-tuned OPT-125M adapter found. Pretrained and rule-based modes remain available.")
+    st.caption("Both OPT modes load the official facebook/opt-125m base model on first use. "
+               "A network connection and enough Streamlit memory are required; CPU inference can be slow.")
     st.divider()
     strategy_label = st.selectbox(
         "Build selection strategy",
@@ -119,6 +127,21 @@ if analyse:
         st.session_state["field_report"] = field_report
         st.session_state["analysis_seconds"] = elapsed
         st.session_state["parsed_query"] = query
+        # Session-only history. Streamlit Cloud's filesystem is ephemeral; the
+        # user must download the CSV/JSON to keep experiment predictions.
+        entry = {
+            "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+            "selected_mode": mode,
+            "actual_source": source,
+            "query": query,
+            "elapsed_s": round(elapsed, 3),
+            "model_only_prediction": req.get("model_prediction"),
+            "confirmed_extraction_before_review": {k: req.get(k) for k in (
+                "use_case", "budget", "currency", "cpu_brand", "gpu_brand",
+                "ram_gb", "storage_gb", "extras", "compact")},
+            "raw_model_output": raw,
+        }
+        st.session_state.setdefault("analysis_history", []).append(entry)
         st.session_state["request_id"] = st.session_state.get("request_id", 0) + 1
         st.session_state.pop("build_result", None)
 
@@ -138,8 +161,21 @@ if "parsed" in st.session_state:
     if req.get("budget_is_default"):
         st.info(f"No budget was found in your message. Default budget RM {req['budget']:,.0f} is being used.")
     if st.session_state["raw"]:
-        with st.expander("Inspect raw OPT output"):
+        with st.expander("Inspect raw OPT output and model-only prediction"):
             st.code(st.session_state["raw"], language="text")
+            st.markdown("**Model-only JSON (before rule-based safety checks)**")
+            st.json(req.get("model_prediction"))
+            st.caption("The review fields use explicit values verified from your input. "
+                       "They can differ from raw OPT predictions; this is a hybrid system.")
+    if st.session_state.get("analysis_history"):
+        recent = st.session_state["analysis_history"][-1]
+        st.download_button(
+            "Download this analysis (JSON)",
+            json.dumps(recent, ensure_ascii=False, indent=2, default=str),
+            file_name="pc_advisor_last_nlp_prediction.json",
+            mime="application/json",
+            key=f"download_analysis_{rid}",
+        )
 
     report = st.session_state["field_report"]
     stated = report[report["Source"] == "User-stated"]
@@ -290,12 +326,56 @@ if "build_result" in st.session_state:
         for warning in result.get("warnings", []):
             st.warning(warning)
 
-with st.expander("Model performance comparison"):
-    comparison_path = A.ROOT / "results" / "model_comparison.csv"
-    if comparison_path.exists():
-        st.dataframe(pd.read_csv(comparison_path), hide_index=True, use_container_width=True)
-    else:
-        st.info("Run the simplified notebook's three-model evaluation section to create results/model_comparison.csv.")
+with st.expander("Saved OPT-125M experimental results", expanded=False):
+    st.write(
+        "These CSVs contain **recorded experimental outputs**, not live "
+        "predictions for the message currently typed above. The pretrained "
+        "base model is still downloaded separately for live inference."
+    )
+    saved_files = {
+        "Same-run evaluation (pretrained zero/few-shot vs fine-tuned LoRA)":
+            "results/opt125m_evaluation.csv",
+        "Saved model predictions from training run":
+            "results/opt125m_predictions.csv",
+        "Recorded evaluation of current project (baseline + pretrained zero-shot)":
+            "results/model_comparison.csv",
+        "Recorded raw pretrained responses from current project":
+            "results/opt_raw_predictions.csv",
+        "Training loss and epochs": "results/opt125m_training.csv",
+    }
+    for label, relpath in saved_files.items():
+        path = A.ROOT / relpath
+        if not path.is_file():
+            continue
+        with st.expander(label):
+            try:
+                df = pd.read_csv(path)
+                st.dataframe(df.head(150), hide_index=True, use_container_width=True)
+                st.caption(f"Showing up to 150 of {len(df)} recorded rows.")
+            except Exception as e:
+                st.info(f"Preview unavailable: {e}")
+            st.download_button("Download " + path.name, path.read_bytes(),
+                               file_name=path.name, mime="text/csv", key="saved_" + path.name)
+    st.info("The saved experimental runs used separate evaluation setups. "
+            "For a rigorous comparison, rerun both models on the same fixed test set "
+            "using the same prompts and measurement procedure.")
+
+if st.session_state.get("analysis_history"):
+    with st.expander("Download predictions from this Streamlit session"):
+        log_df = pd.DataFrame([
+            {**{k: v for k, v in record.items()
+                if k not in ("model_only_prediction", "confirmed_extraction_before_review")},
+             "model_only_prediction": json.dumps(record.get("model_only_prediction"), ensure_ascii=False),
+             "verified_fields": json.dumps(record.get("confirmed_extraction_before_review"), ensure_ascii=False)}
+            for record in st.session_state["analysis_history"]
+        ])
+        st.dataframe(log_df, hide_index=True, use_container_width=True)
+        st.download_button(
+            "Download session predictions CSV",
+            log_df.to_csv(index=False).encode("utf-8"),
+            file_name="streamlit_opt_predictions.csv", mime="text/csv",
+        )
+        st.caption("Session history is not written to GitHub or kept permanently on Streamlit Cloud.")
 
 with st.expander("About this prototype"):
     st.markdown(

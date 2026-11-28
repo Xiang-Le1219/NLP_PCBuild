@@ -16,10 +16,18 @@
     "mouse"
   ],
   "model_status": {
-    "pretrained": "Evaluated",
-    "finetuned": "Not evaluated"
+    "pretrained": "Live inference via facebook/opt-125m download; saved zero-shot and earlier few-shot evaluations available",
+    "finetuned": "LoRA adapter included from user-provided earlier training run; saved historical evaluation available"
   },
   "run_opt_experiments": true,
   "retrain_finetuned_opt125m": true,
-  "generated_at": "2026-11-27 18:02:48"
+  "generated_at": "2026-11-27 18:02:48",
+  "artifact_provenance": {
+    "current_project": "PCBuild-OPT-GitHub-Ready.zip submitted by user in current turn",
+    "adapter_and_finetune_results": "OPT125M-GitHub-Fix.zip provided earlier in this conversation",
+    "pretrained_weights": "Not shipped; loaded on demand from facebook/opt-125m",
+    "current_project_eval": "Results from current project ZIP; no new GPU experiment run here",
+    "previous_training_eval": "Saved results from earlier training; do not conflate test sets/procedures"
+  },
+  "live_streamlit_predictions": "User-session only, downloadable as CSV/JSON; not committed to GitHub automatically"
 }

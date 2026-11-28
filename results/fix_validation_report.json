@@ -1,0 +1,20 @@
+{
+  "scope": "Offline code + data verification for GitHub-ready package",
+  "uploaded_current_project": "PCBuild-OPT-GitHub-Ready.zip",
+  "included_previous_training_adapter_source": "OPT125M-GitHub-Fix.zip (earlier in same conversation)",
+  "adapter": {
+    "present": true,
+    "file": "adapters/extract_125m/adapter_model.safetensors",
+    "lora_matrices_validated": 96,
+    "model": "facebook/opt-125m"
+  },
+  "checks": {
+    "python_syntax": "passed",
+    "offline_smoke_test": "passed (10 input/build cases plus reviewed overrides and model flags)",
+    "random_compatibility_test": "80 sampled requirements, 74 builds returned, 0 validator violations among successful builds; 6 constrained requests unavailable",
+    "live_fine_tuned_model_inference": "NOT TESTED here (base model download unavailable in packaging environment)",
+    "live_pretrained_model_inference": "NOT TESTED here (base model download unavailable in packaging environment)",
+    "live_Streamlit_Cloud": "NOT TESTED; deploy and select a model to verify"
+  },
+  "saved_results_provenance": "Saved OPT data copied from earlier user-provided actual training run; current project pretrained raw outputs preserved; no fabricated or rerun accuracy scores."
+}

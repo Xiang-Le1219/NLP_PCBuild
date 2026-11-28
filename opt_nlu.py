@@ -61,7 +61,7 @@ def generate(model, tok, prompts, max_new_tokens=100, batch_size=8, stop=None):
         context = getattr(model.config, "max_position_embeddings", 2048)
         tok.truncation_side = "left"
         enc = tok(chunk, return_tensors="pt", padding=True, truncation=True,
-                  max_length=context - max_new_tokens).to(model.device)
+                  max_length=context - max_new_tokens).to(next(model.parameters()).device)
         kw = dict(max_new_tokens=max_new_tokens, do_sample=False,
                   pad_token_id=tok.pad_token_id)
         if stop:
@@ -93,12 +93,14 @@ def pick_shots(train, k=4, seed=0):
     return shots
 
 
-def run_extraction(model, tok, texts, shots=None, batch_size=8):
-    """Returns (list of dict|None, seconds_per_example)."""
+def run_extraction(model, tok, texts, shots=None, batch_size=8,
+                   prompt_builder=None):
+    """Returns (list of dict|None, seconds_per_example, raw text)."""
     if shots:
         prompts = [N.few_shot_prompt(t, shots) for t in texts]
     else:
-        prompts = [N.extract_prompt(t) for t in texts]
+        build_prompt = prompt_builder or N.extract_prompt
+        prompts = [build_prompt(t) for t in texts]
     t0 = time.time()
     raw = generate(model, tok, prompts, max_new_tokens=128,
                    batch_size=batch_size, stop=["}"])
@@ -194,11 +196,14 @@ def finetune_lora(name, pairs, out_dir, epochs=2, lr=2e-4, batch_size=8,
 
 
 def load_finetuned(name, adapter_dir):
-    """Base OPT + LoRA adapter, merged into fp16 weights for fast inference."""
+    """Load the base OPT plus a real LoRA adapter for inference.
+
+    Keeping PEFT layers unmerged is friendlier to RAM-limited CPU hosting;
+    a merged model may create a second temporary copy of the base weights.
+    """
     from peft import PeftModel
     tok, base = load_opt(name)
     model = PeftModel.from_pretrained(base, adapter_dir)
-    model = model.merge_and_unload()
     model.eval()
     return tok, model
 
