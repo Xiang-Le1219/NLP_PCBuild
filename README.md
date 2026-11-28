@@ -39,6 +39,38 @@ In the Streamlit UI, **Saved OPT-125M experimental results** displays/downloads 
 - The engine reports infeasible catalogue constraints separately from an insufficient budget, and can show the cheapest available candidate when found.
 - Product compatibility is only checked against simplified rules in this dataset; real BIOS, connector, memory-QVL, PSU transient, GPU clearance and cooler mounting need independent verification.
 
+## RAM and SSD extraction: corrected November 2026
+
+The parser now handles separate component-labelled patterns instead of taking
+unqualified numbers from nearby text. It recognizes, among others:
+
+- `16GB RAM, 512GB SSD`
+- `RAM is 32GB and SSD is 1TB`
+- `RAM should be 32GB and storage should be 2TB`
+- `2 x 16GB RAM` (reported as 32GB total system memory)
+- `SSD 512GB, RAM: 32GB`
+- `32GB 内存，1TB 固态硬盘`
+
+It avoids treating GPU-only VRAM (for example, `RTX 4070 16GB VRAM`) as
+system RAM. `1TB` is normalized to `1000GB` to match the processed catalogue.
+The explicit RAM/SSD values in the user's message override the OPT model's
+JSON guess in both pretrained and fine-tuned modes; the raw model-only output
+is still preserved separately for inspection and evaluation. The detected
+values appear in Review core requirements and are passed as minimum-capacity
+filters to the build engine. Values manually changed in the review form
+replace the previously extracted RAM/SSD filters.
+
+After a successful build, the app now offers a JSON download containing the
+original text, selected model, raw output, model-only prediction, rule-verified
+extraction, user-reviewed values and final recommendation. It also offers a
+CSV download of all completed analyses in the current Streamlit session.
+Streamlit Community Cloud sessions are temporary: download the records to
+keep them after the session ends.
+
+Regression evidence is saved under `results/ram_ssd_parser_regression.csv` and
+`results/ram_ssd_build_regression.csv`; rerun with `python test_ram_ssd_requirements.py`.
+These are offline parser/recommendation tests, not live OPT inference tests.
+
 ## Run and test locally
 
 Use Python 3.11:

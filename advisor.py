@@ -45,8 +45,8 @@ def _explicit_core_fields(text):
         rules["currency"] = "MYR"
         rules["budget_is_default"] = True
     # Ensure model-only guesses do not become user-stated constraints.
-    rules["ram_gb"] = rules.get("ram_gb") if re_search(r"\b(?:ram|memory|ddr[45])\b", corrected) else None
-    rules["storage_gb"] = rules.get("storage_gb") if re_search(r"\b(?:ssd|storage|nvme|hard drive)\b", corrected) else None
+    rules["ram_gb"] = rules.get("ram_gb") if re_search(r"\b(?:ram|memory|memori|ddr[45])\b|内存", corrected) else None
+    rules["storage_gb"] = rules.get("storage_gb") if re_search(r"\b(?:ssd|storage|nvme|hard drive|hard disk|solid state drive)\b|固态硬盘", corrected) else None
     return rules, corrected
 
 

@@ -380,52 +380,108 @@ def has_budget_mention(text):
 
 
 def extract_memory_storage(text):
-    """Parse explicit RAM/SSD amounts without transferring neighbouring numbers.
+    """Extract explicit system RAM and storage capacities in GB.
 
-    Return (ram_gb, storage_gb). GB/TB prefixes are attached to the
-    named component, not arbitrary numbers in the surrounding sentence.
-    Examples: '16GB RAM 1TB SSD', 'RAM: 32gb', 'SSD 1 TB', '2x16 GB RAM'.
+    RAM and storage are parsed separately so a GPU's VRAM or the neighbouring
+    SSD capacity cannot be mistaken for system RAM. A kit such as 2 x 16GB is
+    returned as 32GB total capacity. TB values are normalized using 1TB=1000GB,
+    matching this project's catalogue representation.
     """
-    t = str(text).lower()
-    # Prefer amount-before-component for RAM, e.g. '8GB RAM 256GB SSD'.
-    ram_patterns = [
-        r"\b(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\s*(?:of\s+)?(?:ddr[45](?:[- ]?\d{4,5})?\s*)?(?:ram|system\s+memory|memory|memori)\b",
-        r"\b(?:ram|system\s+memory|memori|memory)\s*(?:capacity|size|of|minimum|min|at least|:|=|-)?\s*(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\b",
-        r"\b[12]\s*[x×]\s*(\d{1,3})\s*gb\s*(?:ram|memory)?\b",
-        r"\b(\d{1,3})\s*gb\s*ddr[45]\s*(?:ram|memory)?\b",
-    ]
+    t = str(text or "").lower()
     ram = None
-    explicit_ram = re.search(
-        r"\b(?:ram|system\s+memory|memori|memory)\s*[:=]\s*"
-        r"(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\b", t
-    )
-    if explicit_ram:
-        ram = int(explicit_ram.group(1))
-    for pat in ram_patterns if ram is None else []:
-        m = re.search(pat, t, flags=re.I)
-        if m:
-            ram = int(m.group(1))
-            if 'x' in m.group(0) or '×' in m.group(0):
-                count = re.match(r'\s*([12])', m.group(0))
-                ram *= int(count.group(1)) if count else 1
+
+    # 1) A multi-module kit describes total system memory (2 x 16GB = 32GB).
+    kit_patterns = [
+        r"\b([1-4])\s*[x×]\s*(\d{1,3})\s*(?:gb|g|gigabytes?)\s*(?:of\s+)?(?:ddr[45](?:[- ]?\d{4,5})?\s*)?(?:ram|memory|memori)?\b",
+        r"\b(?:ram|memory|memori)\s*[:=]?\s*([1-4])\s*[x×]\s*(\d{1,3})\s*(?:gb|g)\b",
+    ]
+    for pattern in kit_patterns:
+        match = re.search(pattern, t, flags=re.I)
+        if match:
+            ram = int(match.group(1)) * int(match.group(2))
             break
 
+    # 2) Explicit label connectors have highest priority. This also handles
+    #    "SSD 512GB, RAM: 32GB" without misreading the SSD amount as RAM.
+    if ram is None:
+        ram_after_labeled = re.search(
+            r"\b(?:system\s+memory|ram|memory|memori|内存)\b"
+            r"\s*(?:is|should\s+be|must\s+be|at\s+least|minimum|min|capacity|size)\s*"
+            r"[:=]?\s*(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\b|"
+            r"\b(?:system\s+memory|ram|memory|memori|内存)\s*[:=]\s*"
+            r"(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\b", t, flags=re.I
+        )
+        if ram_after_labeled:
+            value = next((g for g in ram_after_labeled.groups() if g is not None), None)
+            ram = int(value)
+
+    # 3) Value followed by RAM/memory is preferred over a bare "RAM 256GB"
+    #    match, avoiding capture of a later SSD value.
+    if ram is None:
+        ram_before = re.search(
+            r"\b(\d{1,3})\s*(gb|g|gigs?|gigabytes?)\s*(?:of\s+)?"
+            r"(?:ddr[45](?:[- ]?\d{4,5})?\s*)?"
+            r"(?:system\s+memory|ram|memory|memori|内存)\b", t, flags=re.I
+        )
+        if ram_before:
+            ram = int(ram_before.group(1))
+
+    # 4) Direct label-before-value ("RAM 16GB") is the last fallback.
+    if ram is None:
+        ram_after = re.search(
+            r"\b(?:system\s+memory|ram|memory|memori|内存)\b"
+            r"\s*(\d{1,3})\s*(?:gb|g|gigs?|gigabytes?)\b", t, flags=re.I
+        )
+        if ram_after:
+            ram = int(ram_after.group(1))
+
+    # 4) DDR5 6000 32GB (memory amount follows the DDR generation/speed).
+    if ram is None:
+        ddr_first = re.search(
+            r"\bddr[45](?:[- ]?\d{4,5})?\s+(\d{1,3})\s*(?:gb|g)\b", t, flags=re.I
+        )
+        if ddr_first:
+            ram = int(ddr_first.group(1))
+
     storage = None
-    # A format such as "RAM: 32GB SSD: 512GB" contains a misleading
-    # "32GB SSD" substring. Prefer a numeric value *following* the explicit
-    # SSD label. If it is absent, allow "512GB SSD".
-    storage_after = (
-        r"\b(?:ssd|nvme|storage|solid\s*state\s*drive|hard\s*drive|hard\s*disk)"
-        r"\s*(?:capacity|size|of|at least|minimum|min|:|=|-)?\s*"
-        r"(\d+(?:\.\d+)?)\s*(tb|gb)\b"
+    # Prefer an amount after the named storage component. This avoids the
+    # common false match in "RAM: 32GB, SSD: 512GB".
+    amount = r"(\d+(?:\.\d+)?)\s*(tb|terabytes?|gb|gigabytes?)"
+    storage_after = re.search(
+        r"\b(?:ssd|nvme|storage|solid\s*state\s*drive|hard\s*drive|hard\s*disk|固态硬盘)\b"
+        r"\s*(?:(?:capacity|size|of|is|should\s+be|must\s+be|at\s+least|minimum|min)\s*)?"
+        r"[:=]?\s*" + amount + r"\b", t, flags=re.I
     )
-    storage_before = (
-        r"\b(\d+(?:\.\d+)?)\s*(tb|gb)\s*(?:of\s+)?"
-        r"(?:ssd|nvme|storage|solid\s*state\s*drive|hard\s*drive|hard\s*disk)\b"
-    )
-    match = re.search(storage_after, t) or re.search(storage_before, t)
-    if match:
-        storage = int(round(float(match.group(1)) * (1000 if match.group(2) == 'tb' else 1)))
+    if storage_after:
+        value, unit = float(storage_after.group(1)), storage_after.group(2).lower()
+    else:
+        # Or an amount followed by an explicit storage label.
+        storage_before = re.search(
+            r"\b" + amount + r"\s*(?:of\s+)?"
+            r"(?:ssd|nvme|storage|solid\s*state\s*drive|hard\s*drive|hard\s*disk|固态硬盘)\b",
+            t, flags=re.I
+        )
+        if storage_before:
+            value, unit = float(storage_before.group(1)), storage_before.group(2).lower()
+        else:
+            value = unit = None
+
+    if unit is not None:
+        storage = int(round(value * (1000 if unit.startswith("tb") or unit.startswith("terabyte") else 1)))
+
+    # Common word-number variants used in natural requests (e.g. "one TB SSD").
+    if storage is None:
+        word_units = {
+            "one": 1, "1": 1, "two": 2, "2": 2, "three": 3, "3": 3,
+            "half": 0.5, "half a": 0.5,
+        }
+        word_storage = re.search(
+            r"\b(one|two|three|half(?:\s+a)?)\s*(tb|terabytes?)\s*(?:ssd|nvme|storage)\b",
+            t, flags=re.I
+        )
+        if word_storage:
+            storage = int(word_units[word_storage.group(1).lower()] * 1000)
+
     return ram, storage
 
 

@@ -144,6 +144,7 @@ if analyse:
         st.session_state.setdefault("analysis_history", []).append(entry)
         st.session_state["request_id"] = st.session_state.get("request_id", 0) + 1
         st.session_state.pop("build_result", None)
+        st.session_state.pop("latest_complete_record", None)
 
 if "parsed" in st.session_state:
     req = st.session_state["parsed"]
@@ -202,6 +203,9 @@ if "parsed" in st.session_state:
 
     st.markdown("### Review core requirements")
     st.caption("You can correct the main requirements before generating the build. Dataset-specific filters detected above are also applied.")
+    ram_col, ssd_col = st.columns(2)
+    ram_col.metric("Detected system RAM", f"{int(req['ram_gb'])} GB" if req.get("ram_gb") else "Not specified")
+    ssd_col.metric("Detected storage", f"{int(req['storage_gb'])} GB" if req.get("storage_gb") else "Not specified")
     if st.session_state["raw"]:
         pass
     with st.form(f"review_{rid}"):
@@ -239,7 +243,7 @@ if "parsed" in st.session_state:
         )
         ram = col3.number_input(
             "Minimum RAM (GB; 0 = use profile default)",
-            min_value=0, max_value=1024, value=int(req.get("ram_gb") or 0), step=8,
+            min_value=0, max_value=1024, value=int(req.get("ram_gb") or 0), step=1,
         )
         col1, col2, col3 = st.columns(3)
         storage = col1.number_input(
@@ -273,6 +277,54 @@ if "parsed" in st.session_state:
             with st.spinner("Searching the hardware catalogue and checking compatibility…"):
                 result, violations = A.recommend(engine, confirmed)
             st.session_state["build_result"] = (result, violations)
+
+            # Save the complete pipeline output: original query, raw/model-only
+            # extraction, rule-verified fields, user-reviewed values and build.
+            saved_items = [
+                {
+                    "category": item.get("category"),
+                    "name": item.get("name"),
+                    "spec": item.get("spec"),
+                    "price_myr": float(item.get("price_myr", 0)),
+                    "attributes": item.get("attributes", {}),
+                }
+                for item in result.get("items", [])
+            ]
+            complete_record = {
+                "timestamp_utc": datetime.now(timezone.utc).isoformat(),
+                "original_user_input": st.session_state.get("parsed_query", ""),
+                "selected_model": mode,
+                "actual_extraction_source": st.session_state.get("source", "Unknown"),
+                "raw_model_output": st.session_state.get("raw"),
+                "model_only_prediction": req.get("model_prediction"),
+                "rule_verified_extraction": {
+                    "ram_gb": req.get("ram_gb"),
+                    "storage_gb": req.get("storage_gb"),
+                    "budget": req.get("budget"),
+                    "currency": req.get("currency"),
+                },
+                "user_reviewed_requirements": {
+                    "use_case": use, "budget": budget, "currency": currency,
+                    "cpu_brand": cpu_brand, "gpu_brand": gpu_brand,
+                    "ram_gb": ram or None, "storage_gb": storage or None,
+                    "extras": extras, "compact": compact,
+                    "component_preferences": confirmed.get("component_preferences", {}),
+                },
+                "recommendation": {
+                    "success": bool(result.get("ok")),
+                    "message": result.get("message"),
+                    "total_myr": float(result.get("total_myr", 0)),
+                    "budget_myr": float(result.get("budget_myr", 0)),
+                    "items": saved_items,
+                    "compatibility_violations": violations,
+                    "warnings": result.get("warnings", []),
+                },
+            }
+            st.session_state["latest_complete_record"] = complete_record
+            st.session_state.setdefault("completed_build_history", []).append(complete_record)
+            if st.session_state.get("analysis_history"):
+                st.session_state["analysis_history"][-1]["user_reviewed_requirements"] = complete_record["user_reviewed_requirements"]
+                st.session_state["analysis_history"][-1]["recommendation"] = complete_record["recommendation"]
         except Exception:
             logging.exception("Recommendation failed")
             st.error("Unable to generate a build. Check the hardware files and deployment logs.")
@@ -325,6 +377,50 @@ if "build_result" in st.session_state:
         )
         for warning in result.get("warnings", []):
             st.warning(warning)
+
+if st.session_state.get("latest_complete_record"):
+    with st.expander("Save RAM/SSD extraction and final recommendation", expanded=True):
+        complete = st.session_state["latest_complete_record"]
+        st.markdown("**Values used by the build engine**")
+        saved_ram, saved_ssd = st.columns(2)
+        saved_ram.metric("RAM used", f"{complete['user_reviewed_requirements']['ram_gb']} GB" if complete['user_reviewed_requirements']['ram_gb'] else "Profile default")
+        saved_ssd.metric("SSD used", f"{complete['user_reviewed_requirements']['storage_gb']} GB" if complete['user_reviewed_requirements']['storage_gb'] else "Profile default")
+        st.download_button(
+            "Download complete analysis + build (JSON)",
+            json.dumps(complete, ensure_ascii=False, indent=2, default=str),
+            file_name="pcbuild_complete_analysis.json",
+            mime="application/json",
+            key=f"download_complete_json_{st.session_state.get('request_id', 0)}",
+        )
+        history = st.session_state.get("completed_build_history", [])
+        rows = []
+        for record in history:
+            user_req = record.get("user_reviewed_requirements", {})
+            build = record.get("recommendation", {})
+            rows.append({
+                "timestamp_utc": record.get("timestamp_utc"),
+                "user_input": record.get("original_user_input"),
+                "model": record.get("selected_model"),
+                "actual_extraction_source": record.get("actual_extraction_source"),
+                "ram_gb": user_req.get("ram_gb"),
+                "storage_gb": user_req.get("storage_gb"),
+                "budget": user_req.get("budget"),
+                "currency": user_req.get("currency"),
+                "build_success": build.get("success"),
+                "total_myr": build.get("total_myr"),
+                "items_json": json.dumps(build.get("items", []), ensure_ascii=False, default=str),
+            })
+        history_df = pd.DataFrame(rows)
+        if not history_df.empty:
+            st.dataframe(history_df, hide_index=True, use_container_width=True)
+            st.download_button(
+                "Download all completed analyses (CSV)",
+                history_df.to_csv(index=False).encode("utf-8"),
+                file_name="pcbuild_ram_ssd_history.csv",
+                mime="text/csv",
+                key=f"download_history_csv_{st.session_state.get('request_id', 0)}",
+            )
+        st.caption("Downloads include the original input, model prediction, corrected/reviewed RAM and SSD values, and final recommendation. Session history is temporary on Streamlit Cloud; download the files to retain them.")
 
 with st.expander("Saved OPT-125M experimental results", expanded=False):
     st.write(
